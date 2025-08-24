@@ -1,0 +1,59 @@
+[
+  {
+    "id": "valentines-day",
+    "imageUrl": "/occasions/11.png",
+    "nameKey": "home.occasions.items.valentinesDay"
+  },
+  {
+    "id": "mothers-day",
+    "imageUrl": "/occasions/10.png",
+    "nameKey": "home.occasions.items.mothersDay"
+  },
+  {
+    "id": "eid-adha",
+    "imageUrl": "/occasions/2.png",
+    "nameKey": "home.occasions.items.eidAdha"
+  },
+  {
+    "id": "birthdays",
+    "imageUrl": "/occasions/4.png",
+    "nameKey": "home.occasions.items.birthdays"
+  },
+  {
+    "id": "thank-you",
+    "imageUrl": "/occasions/8.png",
+    "nameKey": "home.occasions.items.thankYou"
+  },
+
+  {
+    "id": "new-year",
+    "imageUrl": "/occasions/9.png",
+    "nameKey": "home.occasions.items.newYear"
+  },
+  {
+    "id": "wedding",
+    "imageUrl": "/occasions/7.png",
+    "nameKey": "home.occasions.items.wedding"
+  },
+  {
+    "id": "graduation",
+    "imageUrl": "/occasions/5.png",
+    "nameKey": "home.occasions.items.graduation"
+  },
+  {
+    "id": "eid-fitr",
+    "imageUrl": "/occasions/1.png",
+    "nameKey": "home.occasions.items.eidFitr"
+  },
+  {
+    "id": "anniversary",
+    "imageUrl": "/occasions/6.png",
+    "nameKey": "home.occasions.items.anniversary"
+  },
+
+  {
+    "id": "el-hajj",
+    "imageUrl": "/occasions/3.png",
+    "nameKey": "home.occasions.items.elHajj"
+  }
+]

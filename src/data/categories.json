@@ -1,0 +1,57 @@
+[
+  {
+    "id": "flowers",
+    "nameKey": "home.categories.items.flowers",
+    "imageUrl": "/categories/1.png"
+  },
+  {
+    "id": "jewelry",
+    "nameKey": "home.categories.items.jewelry",
+    "imageUrl": "/categories/2.png"
+  },
+  {
+    "id": "plants",
+    "nameKey": "home.categories.items.plants",
+    "imageUrl": "/categories/3.png"
+  },
+  {
+    "id": "perfumes",
+    "nameKey": "home.categories.items.perfumes",
+    "imageUrl": "/categories/4.png"
+  },
+  {
+    "id": "beauty-care",
+    "nameKey": "home.categories.items.beautyCare",
+    "imageUrl": "/categories/5.png"
+  },
+  {
+    "id": "personal-care",
+    "nameKey": "home.categories.items.personalCare",
+    "imageUrl": "/categories/6.png"
+  },
+  {
+    "id": "vases",
+    "nameKey": "home.categories.items.vases",
+    "imageUrl": "/categories/7.png"
+  },
+  {
+    "id": "balloons",
+    "nameKey": "home.categories.items.balloons",
+    "imageUrl": "/categories/8.png"
+  },
+  {
+    "id": "coupons",
+    "nameKey": "home.categories.items.coupons",
+    "imageUrl": "/categories/9.png"
+  },
+  {
+    "id": "party-favors",
+    "nameKey": "home.categories.items.partyFavors",
+    "imageUrl": "/categories/10.png"
+  },
+  {
+    "id": "chocolate-cake",
+    "nameKey": "home.categories.items.chocolateCake",
+    "imageUrl": "/categories/11.png"
+  }
+]
