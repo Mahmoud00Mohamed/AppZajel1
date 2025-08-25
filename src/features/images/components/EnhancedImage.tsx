@@ -204,7 +204,7 @@ const EnhancedImage: React.FC<EnhancedImageProps> = ({
         <img
           src={imageSrc}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover filter  scale-105"
+          className="absolute inset-0 w-full h-full object-cover filter"
           loading="eager"
           aria-hidden="true"
         />
