@@ -216,14 +216,15 @@ const EnhancedImage: React.FC<EnhancedImageProps> = ({
       </AnimatePresence>
 
       {/* High Quality Image */}
+
       <AnimatePresence>
         {imageState === "loaded" && (
           <motion.img
-            initial={{ scale: enableBlurUp ? 1.02 : 1 }}
-            animate={{ scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{
-              duration: 0.4, // أسرع وأخف
-              ease: "easeOut",
+              duration: 0.6, // يمكن زيادة المدة قليلاً لنعومة أكثر
+              ease: "circOut", // هذا النوع من ease يعطي إحساساً بالخفة
             }}
             src={imageSrc}
             alt={alt}

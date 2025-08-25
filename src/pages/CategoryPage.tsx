@@ -1,92 +1,343 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useParams } from "react-router-dom";
-import { Search, Filter, Grid, List, Eye } from "lucide-react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import {
+  Search,
+  Filter,
+  Grid,
+  List,
+  Eye,
+  X,
+  ChevronDown,
+  ChevronUp,
+  Flame,
+  Sparkles,
+  DollarSign,
+  CheckCircle,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import categories from "../data/categories.json";
 import { allProducts, getProductsByCategory } from "../data";
+import { ProductImage } from "../features/images";
 import FavoriteButton from "../components/ui/FavoriteButton";
 import AddToCartButton from "../components/ui/AddToCartButton";
-import { ProductImage } from "../features/images";
-import { useImagePreloader } from "../features/images";
+
+interface FilterState {
+  priceRange: [number, number];
+  features: string[];
+  categories: string[];
+  sortBy: string;
+}
 
 const CategoryPage: React.FC = () => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === "ar";
   const { slug } = useParams<{ slug: string }>();
-
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("featured");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [expandedFilters, setExpandedFilters] = useState<string[]>([
+    "price",
+    "features",
+    "categories",
+  ]);
+  const [quickFilters, setQuickFilters] = useState<string[]>([]);
 
-  const filteredCategories = slug
-    ? categories.filter((category) => category.id === slug)
-    : categories;
-
-  let filteredProducts = slug ? getProductsByCategory(slug) : allProducts;
-
-  if (searchTerm) {
-    filteredProducts = filteredProducts.filter((product) =>
-      (isRtl ? product.nameAr : product.nameEn)
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    );
-  }
-
-  filteredProducts = filteredProducts.filter(
-    (product) =>
-      product.price >= priceRange[0] && product.price <= priceRange[1]
-  );
-
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
-    switch (sortBy) {
-      case "price-low":
-        return a.price - b.price;
-      case "price-high":
-        return b.price - a.price;
-      case "name":
-        return isRtl
-          ? a.nameAr.localeCompare(b.nameAr)
-          : a.nameEn.localeCompare(b.nameEn);
-      default:
-        return b.isBestSeller ? 1 : -1;
-    }
+  const [filters, setFilters] = useState<FilterState>({
+    priceRange: [0, Infinity],
+    features: [],
+    categories: slug ? [slug] : [],
+    sortBy: "featured",
   });
 
-  // Preload visible product images
-  const visibleProducts = React.useMemo(
-    () => sortedProducts.slice(0, 12),
-    [sortedProducts]
-  );
-  const productImages = React.useMemo(
-    () => visibleProducts.map((product) => product.imageUrl),
-    [visibleProducts]
-  );
-  useImagePreloader(productImages, { priority: false });
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-  if (slug && filteredCategories.length === 0) {
+  useEffect(() => {
+    const search = searchParams.get("search");
+    if (search) setSearchTerm(search);
+    const category = searchParams.get("category");
+    if (category) {
+      setFilters((prev) => ({ ...prev, categories: [category] }));
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (searchTerm) params.set("search", searchTerm);
+    if (filters.categories.length > 0)
+      params.set("category", filters.categories[0]);
+    setSearchParams(params);
+  }, [searchTerm, filters.categories, setSearchParams]);
+
+  const quickFilterOptions = [
+    {
+      id: "bestseller",
+      label: isRtl ? "الأكثر مبيعاً" : "Best Sellers",
+      icon: <Flame size={12} />,
+      color: "bg-amber-50 text-amber-700 border-amber-100",
+    },
+    {
+      id: "special",
+      label: isRtl ? "هدايا مميزة" : "Special Gifts",
+      icon: <Sparkles size={12} />,
+      color: "bg-purple-50 text-purple-700 border-purple-100",
+    },
+    {
+      id: "premium",
+      label: isRtl ? "فاخر" : "Premium",
+      icon: <DollarSign size={12} />,
+      color: "bg-purple-50 text-purple-700 border-purple-100",
+    },
+    {
+      id: "affordable",
+      label: isRtl ? "بأسعار معقولة" : "Affordable",
+      icon: <DollarSign size={12} />,
+      color: "bg-green-50 text-green-700 border-green-100",
+    },
+  ];
+
+  const priceRanges = useMemo(
+    () => [
+      {
+        id: "under-350",
+        label: isRtl ? "أقل من 350 ر.س" : "Under 350 SAR",
+        range: [0, 349],
+        count: allProducts.filter((p) => p.price < 350).length,
+      },
+      {
+        id: "350-700",
+        label: isRtl ? "350 ر.س إلى 700 ر.س" : "350 SAR to 700 SAR",
+        range: [350, 700],
+        count: allProducts.filter((p) => p.price >= 350 && p.price <= 700)
+          .length,
+      },
+      {
+        id: "700-1000",
+        label: isRtl ? "700 ر.س إلى 1000 ر.س" : "700 SAR to 1000 SAR",
+        range: [701, 1000],
+        count: allProducts.filter((p) => p.price > 700 && p.price <= 1000)
+          .length,
+      },
+      {
+        id: "over-1000",
+        label: isRtl ? "أكثر من 1000 ر.س" : "Over 1000 SAR",
+        range: [1001, Infinity],
+        count: allProducts.filter((p) => p.price > 1000).length,
+      },
+    ],
+    [isRtl]
+  );
+
+  const filteredProducts = useMemo(() => {
+    let products = slug ? getProductsByCategory(slug) : allProducts;
+
+    if (searchTerm) {
+      products = products.filter((product) =>
+        (isRtl ? product.nameAr : product.nameEn)
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (filters.categories.length > 0) {
+      products = products.filter(
+        (product) =>
+          product.categoryId && filters.categories.includes(product.categoryId)
+      );
+    }
+
+    if (filters.priceRange[0] !== 0 || filters.priceRange[1] !== Infinity) {
+      products = products.filter(
+        (product) =>
+          product.price >= filters.priceRange[0] &&
+          product.price <= filters.priceRange[1]
+      );
+    }
+
+    const allFeatures = [...filters.features, ...quickFilters];
+    if (allFeatures.length > 0) {
+      products = products.filter((product) =>
+        allFeatures.every((feature) => {
+          switch (feature) {
+            case "bestseller":
+              return product.isBestSeller;
+            case "special":
+              return product.isSpecialGift;
+            case "premium":
+              return product.price > 300;
+            case "affordable":
+              return product.price <= 200;
+            default:
+              return true;
+          }
+        })
+      );
+    }
+
+    return products.sort((a, b) => {
+      switch (filters.sortBy) {
+        case "price-low":
+          return a.price - b.price;
+        case "price-high":
+          return b.price - a.price;
+        case "name":
+          return isRtl
+            ? a.nameAr.localeCompare(b.nameAr)
+            : a.nameEn.localeCompare(b.nameEn);
+        default:
+          return (b.isBestSeller ? 1 : 0) - (a.isBestSeller ? 1 : 0);
+      }
+    });
+  }, [searchTerm, filters, quickFilters, isRtl, slug]);
+
+  const filterOptions = {
+    categories: categories,
+    features: [
+      {
+        id: "bestseller",
+        nameKey: isRtl ? "الأكثر مبيعاً" : "Best Seller",
+        icon: <Sparkles size={14} />,
+        count: allProducts.filter((p) => p.isBestSeller).length,
+      },
+      {
+        id: "special",
+        nameKey: isRtl ? "هدية مميزة" : "Special Gift",
+        icon: <Sparkles size={14} />,
+        count: allProducts.filter((p) => p.isSpecialGift).length,
+      },
+      {
+        id: "premium",
+        nameKey: isRtl ? "فاخر" : "Premium",
+        icon: <DollarSign size={14} />,
+        count: allProducts.filter((p) => p.price > 300).length,
+      },
+      {
+        id: "affordable",
+        nameKey: isRtl ? "بأسعار معقولة" : "Affordable",
+        icon: <DollarSign size={14} />,
+        count: allProducts.filter((p) => p.price <= 200).length,
+      },
+    ],
+    sortOptions: [
+      {
+        value: "featured",
+        label: isRtl ? "مميز" : "Featured",
+        icon: <Sparkles size={14} />,
+      },
+      {
+        value: "price-low",
+        label: isRtl ? "السعر: منخفض إلى مرتفع" : "Price: Low to High",
+        icon: <DollarSign size={14} />,
+      },
+      {
+        value: "price-high",
+        label: isRtl ? "السعر: مرتفع إلى منخفض" : "Price: High to Low",
+        icon: <DollarSign size={14} />,
+      },
+      {
+        value: "name",
+        label: isRtl ? "الاسم" : "Name",
+        icon: <DollarSign size={14} />,
+      },
+    ],
+  };
+
+  const updateFilter = (
+    key: keyof FilterState,
+    value: FilterState[keyof FilterState]
+  ) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const toggleArrayFilter = (key: "features" | "categories", value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: prev[key].includes(value)
+        ? prev[key].filter((item) => item !== value)
+        : [...prev[key], value],
+    }));
+  };
+
+  const handlePriceRangeSelect = (min: number, max: number) => {
+    setFilters((prev) => ({ ...prev, priceRange: [min, max] }));
+  };
+
+  const toggleQuickFilter = (filterId: string) => {
+    setQuickFilters((prev) =>
+      prev.includes(filterId)
+        ? prev.filter((id) => id !== filterId)
+        : [...prev, filterId]
+    );
+  };
+
+  const toggleFilterExpansion = (filterKey: string) => {
+    setExpandedFilters((prev) =>
+      prev.includes(filterKey)
+        ? prev.filter((key) => key !== filterKey)
+        : [...prev, filterKey]
+    );
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      priceRange: [0, Infinity],
+      features: [],
+      categories: slug ? [slug] : [],
+      sortBy: "featured",
+    });
+    setQuickFilters([]);
+    setSearchTerm("");
+  };
+
+  const hasActiveFilters =
+    filters.features.length > 0 ||
+    filters.categories.length > (slug ? 1 : 0) ||
+    filters.priceRange[0] !== 0 ||
+    filters.priceRange[1] !== Infinity ||
+    searchTerm.length > 0 ||
+    quickFilters.length > 0;
+
+  const activeFiltersCount =
+    filters.features.length +
+    (filters.categories.length > (slug ? 1 : 0)
+      ? filters.categories.length
+      : 0) +
+    quickFilters.length +
+    (filters.priceRange[0] !== 0 || filters.priceRange[1] !== Infinity
+      ? 1
+      : 0) +
+    (searchTerm.length > 0 ? 1 : 0);
+
+  if (slug && !categories.some((category) => category.id === slug)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 to-purple-50">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center p-8 bg-white rounded-3xl shadow-2xl max-w-md mx-4"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center p-8 bg-white rounded-2xl shadow-lg max-w-md mx-4 border border-neutral-100"
         >
-          <div className="w-24 h-24 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-6">
-            <Search size={40} className="text-white" />
+          <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Search size={32} className="text-purple-600" />
           </div>
-          <h1 className="text-2xl font-bold mb-4 text-gray-800">
+          <h1 className="text-xl font-bold text-neutral-800 mb-4">
             {isRtl ? "الفئة غير موجودة" : "Category Not Found"}
           </h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-neutral-600 mb-6 text-sm">
             {isRtl
               ? "عذراً، الفئة المطلوبة غير متوفرة."
               : "Sorry, the requested category is not available."}
           </p>
-          <Link to="/" className="btn btn-primary">
+          <Link
+            to="/"
+            className="px-5 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-bold shadow-md"
+          >
             {t("product.backToHome")}
           </Link>
         </motion.div>
@@ -95,369 +346,724 @@ const CategoryPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary/5">
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-accent opacity-90"></div>
-        <div className="absolute inset-0">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
-          <div className="absolute bottom-20 right-20 w-48 h-48 bg-white/5 rounded-full blur-2xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-purple-50 px-4 sm:px-6 lg:px-8 font-serif text-neutral-800">
+      <div className="max-w-7xl mx-auto py-8 flex flex-col lg:flex-row gap-8">
+        {/* Desktop Filters Sidebar */}
+        <div className="hidden lg:block w-72 flex-shrink-0">
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-neutral-100">
+            <div className="mb-6">
+              <label className="flex items-center gap-2 text-sm font-bold text-purple-800 mb-3">
+                <Search size={16} />
+                {isRtl ? "البحث" : "Search"}
+              </label>
+              <div className="relative">
+                <Search
+                  size={16}
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400"
+                />
+                <input
+                  type="text"
+                  placeholder={
+                    isRtl ? "ابحث عن المنتجات..." : "Search products..."
+                  }
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-purple-400 text-sm transition-all duration-300 bg-neutral-50 placeholder-neutral-400"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm("")}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between mb-6 border-b border-neutral-200 pb-3">
+              <h3 className="flex items-center gap-2 text-sm font-bold text-purple-800">
+                <Filter size={16} />
+                {isRtl ? "فلاتر التصفية" : "Filters"}
+              </h3>
+              {hasActiveFilters && (
+                <button
+                  onClick={clearFilters}
+                  className="flex items-center gap-1 text-xs text-rose-600 hover:text-rose-700 transition-colors font-medium"
+                >
+                  <X size={12} />
+                  {isRtl ? "مسح الكل" : "Clear"}
+                </button>
+              )}
+            </div>
+
+            {hasActiveFilters && (
+              <div className="mb-6 p-3 bg-purple-50 rounded-lg text-xs text-purple-700 font-bold border border-purple-100">
+                {activeFiltersCount} {isRtl ? "فلتر نشط" : "active filters"} •{" "}
+                {filteredProducts.length} {isRtl ? "نتيجة" : "results"}
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-100">
+                <button
+                  onClick={() => toggleFilterExpansion("categories")}
+                  className="w-full flex items-center justify-between text-sm font-bold text-neutral-800"
+                >
+                  <span className="flex items-center gap-2">
+                    <Filter size={16} className="text-purple-600" />
+                    {isRtl ? "الفئات" : "Categories"}
+                  </span>
+                  {expandedFilters.includes("categories") ? (
+                    <ChevronUp size={16} className="text-neutral-500" />
+                  ) : (
+                    <ChevronDown size={16} className="text-neutral-500" />
+                  )}
+                </button>
+                <AnimatePresence>
+                  {expandedFilters.includes("categories") && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-3 space-y-3 overflow-hidden"
+                    >
+                      {filterOptions.categories.map((category) => {
+                        const categoryCount = allProducts.filter(
+                          (p) => p.categoryId === category.id
+                        ).length;
+                        return (
+                          <label
+                            key={category.id}
+                            className="flex items-center gap-3 text-sm text-neutral-700 cursor-pointer hover:text-purple-600 transition-colors"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={filters.categories.includes(category.id)}
+                              onChange={() =>
+                                toggleArrayFilter("categories", category.id)
+                              }
+                              className="rounded border-neutral-300 text-purple-500 focus:ring-purple-500 w-4 h-4"
+                            />
+                            <span className="font-medium">
+                              {t(category.nameKey)}
+                            </span>
+                            <span className="text-xs text-neutral-400 font-normal">
+                              ({categoryCount})
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-100">
+                <button
+                  onClick={() => toggleFilterExpansion("price")}
+                  className="w-full flex items-center justify-between text-sm font-bold text-neutral-800"
+                >
+                  <span className="flex items-center gap-2">
+                    <DollarSign size={16} className="text-purple-600" />
+                    {isRtl ? "نطاق السعر" : "Price Range"}
+                  </span>
+                  {expandedFilters.includes("price") ? (
+                    <ChevronUp size={16} className="text-neutral-500" />
+                  ) : (
+                    <ChevronDown size={16} className="text-neutral-500" />
+                  )}
+                </button>
+                <AnimatePresence>
+                  {expandedFilters.includes("price") && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-3 space-y-3 overflow-hidden"
+                    >
+                      {priceRanges.map((rangeOption) => (
+                        <label
+                          key={rangeOption.id}
+                          className="flex items-center gap-3 text-sm text-neutral-700 cursor-pointer hover:text-purple-600 transition-colors"
+                        >
+                          <input
+                            type="radio"
+                            name="priceRange"
+                            checked={
+                              filters.priceRange[0] === rangeOption.range[0] &&
+                              filters.priceRange[1] === rangeOption.range[1]
+                            }
+                            onChange={() =>
+                              handlePriceRangeSelect(
+                                rangeOption.range[0],
+                                rangeOption.range[1]
+                              )
+                            }
+                            className="rounded-full border-neutral-300 text-purple-500 focus:ring-purple-500 w-4 h-4"
+                          />
+                          <span className="font-medium">
+                            {rangeOption.label}
+                          </span>
+                          <span className="text-xs text-neutral-400 font-normal">
+                            ({rangeOption.count})
+                          </span>
+                        </label>
+                      ))}
+                      <div className="text-xs text-neutral-600 font-medium pt-2 border-t border-neutral-100">
+                        {isRtl ? "النطاق المحدد: " : "Selected Range: "}
+                        {filters.priceRange[0]} {isRtl ? "ر.س" : "SAR"}{" "}
+                        {isRtl ? "إلى" : "to"}{" "}
+                        {filters.priceRange[1] === Infinity
+                          ? isRtl
+                            ? "أقصى"
+                            : "Max"
+                          : filters.priceRange[1]}{" "}
+                        {isRtl ? "ر.س" : "SAR"}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <div className="bg-neutral-50 rounded-lg p-4 border border-neutral-100">
+                <button
+                  onClick={() => toggleFilterExpansion("features")}
+                  className="w-full flex items-center justify-between text-sm font-bold text-neutral-800"
+                >
+                  <span className="flex items-center gap-2">
+                    <Sparkles size={16} className="text-purple-600" />
+                    {isRtl ? "المميزات" : "Features"}
+                  </span>
+                  {expandedFilters.includes("features") ? (
+                    <ChevronUp size={16} className="text-neutral-500" />
+                  ) : (
+                    <ChevronDown size={16} className="text-neutral-500" />
+                  )}
+                </button>
+                <AnimatePresence>
+                  {expandedFilters.includes("features") && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mt-3 space-y-3 overflow-hidden"
+                    >
+                      {filterOptions.features.map((feature) => (
+                        <label
+                          key={feature.id}
+                          className="flex items-center gap-3 text-sm text-neutral-700 cursor-pointer hover:text-purple-600 transition-colors"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={filters.features.includes(feature.id)}
+                            onChange={() =>
+                              toggleArrayFilter("features", feature.id)
+                            }
+                            className="rounded border-neutral-300 text-purple-500 focus:ring-purple-500 w-4 h-4"
+                          />
+                          <span className="font-medium">{feature.nameKey}</span>
+                          <span className="text-xs text-neutral-400 font-normal">
+                            ({feature.count})
+                          </span>
+                        </label>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="relative container-custom py-20">
-          <div className="text-center text-white">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-              {slug
-                ? t(`home.categories.items.${slug}`)
-                : t("home.categories.title")}
-            </h1>
-            <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto">
-              {isRtl
-                ? "اكتشف مجموعتنا المميزة من الهدايا الفاخرة"
-                : "Discover our exclusive collection of premium gifts"}
-            </p>
+        {/* Main Content */}
+        <div className="flex-1 min-w-0">
+          <div className="bg-white rounded-2xl shadow-lg p-5 border border-neutral-100 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-4">
+              <div className="relative flex-1 w-full lg:hidden">
+                <Search
+                  size={16}
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400"
+                />
+                <input
+                  type="text"
+                  placeholder={t("header.search")}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-purple-400 text-sm bg-neutral-50 placeholder-neutral-400"
+                />
+              </div>
+
+              {isMobile && (
+                <button
+                  onClick={() => setShowMobileFilters(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-bold hover:bg-purple-700 transition-colors shadow-md"
+                >
+                  <Filter size={14} />
+                  {isRtl ? "فلتر" : "Filter"}
+                  {hasActiveFilters && (
+                    <span className="bg-white text-purple-600 rounded-full w-4 h-4 text-xs flex items-center justify-center font-bold">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </button>
+              )}
+
+              <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                <div className="text-sm text-neutral-700 font-medium">
+                  <span className="font-bold text-purple-600">
+                    {filteredProducts.length}
+                  </span>{" "}
+                  {isRtl ? "منتج" : "products"}
+                </div>
+                <div className="relative">
+                  <select
+                    value={filters.sortBy}
+                    onChange={(e) => updateFilter("sortBy", e.target.value)}
+                    className="appearance-none pl-4 pr-10 py-2 border border-neutral-200 rounded-lg focus:ring-2 focus:ring-purple-400 text-sm bg-neutral-50 cursor-pointer font-medium"
+                  >
+                    {filterOptions.sortOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown
+                    size={16}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 pointer-events-none"
+                  />
+                </div>
+                <div className="flex bg-neutral-100 rounded-lg p-1 shadow-inner">
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === "grid"
+                        ? "bg-white text-purple-600 shadow-sm"
+                        : "text-neutral-500 hover:bg-neutral-200"
+                    }`}
+                  >
+                    <Grid size={16} />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === "list"
+                        ? "bg-white text-purple-600 shadow-sm"
+                        : "text-neutral-500 hover:bg-neutral-200"
+                    }`}
+                  >
+                    <List size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {!isMobile && (
+              <div className="mt-4 flex flex-wrap gap-2 overflow-x-auto pb-2 scrollbar-hidden">
+                {quickFilterOptions.map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => toggleQuickFilter(option.id)}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 ${
+                      quickFilters.includes(option.id)
+                        ? option.color
+                        : "bg-neutral-50 text-neutral-600 border-neutral-200 hover:bg-neutral-100"
+                    }`}
+                  >
+                    {option.icon}
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="pb-8">
+            {!slug && (
+              <div className="mb-8">
+                <h2 className="text-xl font-bold text-neutral-800 mb-4 text-center">
+                  {isRtl ? "تصفح الفئات" : "Browse Categories"}
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  {categories.map((category, index) => (
+                    <div key={category.id}>
+                      <Link
+                        to={`/category/${category.id}`}
+                        className="group block"
+                      >
+                        <div className="relative aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-purple-50 to-rose-50 shadow-md hover:shadow-lg transition-all duration-300">
+                          <ProductImage
+                            src={category.imageUrl}
+                            alt={t(category.nameKey)}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            width={200}
+                            height={200}
+                            aspectRatio="square"
+                            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 16.66vw, 200px"
+                            quality={75}
+                            priority={index < 6}
+                            showZoom={false}
+                            placeholderSize={24}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          <h3 className="absolute bottom-3 left-0 right-0 text-center text-sm font-bold text-white">
+                            {t(category.nameKey)}
+                          </h3>
+                          <div className="absolute top-2 right-2 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <Eye size={16} className="text-white" />
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <AnimatePresence mode="wait">
+              {filteredProducts.length > 0 ? (
+                viewMode === "grid" ? (
+                  <motion.div
+                    key="grid"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+                  >
+                    {filteredProducts.map((product, index) => (
+                      <div
+                        key={product.id}
+                        className="bg-white rounded-xl shadow-md border border-neutral-100 overflow-hidden relative group transition-transform duration-300"
+                      >
+                        <Link to={`/product/${product.id}`} className="block">
+                          <div className="relative aspect-[4/3] overflow-hidden">
+                            <ProductImage
+                              src={product.imageUrl}
+                              alt={isRtl ? product.nameAr : product.nameEn}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                              width={240}
+                              height={180}
+                              aspectRatio="landscape"
+                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                              quality={75}
+                              priority={index < 8}
+                              showZoom={false}
+                              placeholderSize={28}
+                            />
+                            <div className="absolute top-2 left-2 flex flex-col gap-1">
+                              {product.isBestSeller && (
+                                <span className="bg-amber-100 text-amber-800 text-xs font-bold py-0.5 px-1.5 rounded-full flex items-center gap-1 shadow-sm">
+                                  <Flame size={10} />
+                                  {isRtl ? "الأكثر مبيعاً" : "Best Seller"}
+                                </span>
+                              )}
+                              {product.isSpecialGift && (
+                                <span className="bg-purple-100 text-purple-800 text-xs font-bold py-0.5 px-1.5 rounded-full flex items-center gap-1 shadow-sm">
+                                  <Sparkles size={10} />
+                                  {isRtl ? "مميز" : "Special"}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                        <div className="p-3 relative">
+                          <div className="absolute top-0 right-3 transform -translate-y-1/2">
+                            <FavoriteButton
+                              product={product}
+                              className="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center text-rose-500 border border-neutral-100 transition-all duration-300 hover:scale-110"
+                              size={16}
+                            />
+                          </div>
+                          <Link to={`/product/${product.id}`}>
+                            <h3 className="text-sm font-bold text-neutral-800 hover:text-purple-600 transition-colors line-clamp-2 mb-1 min-h-[2.5rem]">
+                              {isRtl ? product.nameAr : product.nameEn}
+                            </h3>
+                          </Link>
+                          <div className="flex items-center justify-between mt-2">
+                            <p className="text-base font-bold text-purple-700">
+                              {product.price} {isRtl ? "ر.س" : "SAR"}
+                            </p>
+                            <AddToCartButton
+                              product={product}
+                              variant="primary"
+                              size="sm"
+                              className="px-3 py-1.5 bg-purple-600 text-white rounded-lg shadow-md text-xs font-semibold hover:bg-purple-700 transition-colors"
+                              showLabel={!isMobile}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="list"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="space-y-4"
+                  >
+                    {filteredProducts.map((product, index) => (
+                      <div
+                        key={product.id}
+                        className="bg-white rounded-xl shadow-md border border-neutral-100 p-4 flex flex-col sm:flex-row gap-4 items-start transition-transform duration-300"
+                      >
+                        <Link
+                          to={`/product/${product.id}`}
+                          className="flex-shrink-0 w-28 h-28"
+                        >
+                          <ProductImage
+                            src={product.imageUrl}
+                            alt={isRtl ? product.nameAr : product.nameEn}
+                            className="w-full h-full object-cover rounded-lg shadow-sm"
+                            width={112}
+                            height={112}
+                            aspectRatio="square"
+                            sizes="112px"
+                            quality={75}
+                            priority={index < 4}
+                            showZoom={false}
+                          />
+                        </Link>
+                        <div className="flex-1 flex flex-col justify-between w-full">
+                          <div>
+                            <Link to={`/product/${product.id}`}>
+                              <h3 className="text-base font-bold text-neutral-800 hover:text-purple-600 transition-colors mb-1">
+                                {isRtl ? product.nameAr : product.nameEn}
+                              </h3>
+                            </Link>
+                            <div className="flex flex-wrap gap-1.5 mb-2">
+                              {product.isBestSeller && (
+                                <span className="bg-amber-100 text-amber-800 text-xs px-1.5 py-0.5 rounded-full font-semibold">
+                                  {isRtl ? "الأكثر مبيعاً" : "Best Seller"}
+                                </span>
+                              )}
+                              {product.isSpecialGift && (
+                                <span className="bg-purple-100 text-purple-800 text-xs px-1.5 py-0.5 rounded-full font-semibold">
+                                  {isRtl ? "مميز" : "Special"}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-neutral-600 line-clamp-2">
+                              {isRtl
+                                ? product.descriptionAr
+                                : product.descriptionEn}
+                            </p>
+                          </div>
+                          <div className="flex items-center justify-between mt-3">
+                            <p className="text-lg font-bold text-purple-700">
+                              {product.price} {isRtl ? "ر.س" : "SAR"}
+                            </p>
+                            <AddToCartButton
+                              product={product}
+                              variant="primary"
+                              size="sm"
+                              className="px-3 py-1.5 bg-purple-600 text-white rounded-lg shadow-md text-xs font-semibold hover:bg-purple-700 transition-colors"
+                              showLabel={true}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </motion.div>
+                )
+              ) : (
+                <motion.div
+                  key="no-products"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-16 bg-white rounded-xl shadow-md border border-neutral-100"
+                >
+                  <div className="w-20 h-20 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
+                    <Search size={32} className="text-neutral-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-neutral-800 mb-2">
+                    {isRtl ? "لا توجد منتجات" : "No Products Found"}
+                  </h3>
+                  <p className="text-neutral-600 mb-6 text-sm max-w-sm mx-auto font-medium">
+                    {isRtl
+                      ? "لا توجد منتجات تطابق معايير البحث. جرب تعديل الفلاتر أو مسحها."
+                      : "No products match your search criteria. Try adjusting or clearing filters."}
+                  </p>
+                  <button
+                    onClick={clearFilters}
+                    className="px-5 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors flex items-center gap-2 mx-auto text-sm font-bold shadow-md"
+                  >
+                    <X size={14} />
+                    {isRtl ? "مسح الفلاتر" : "Clear Filters"}
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
 
-      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
-        <div className="container-custom py-4">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="relative flex-1 max-w-md">
-              <Search
-                size={20}
-                className="absolute left-3 rtl:right-3 rtl:left-auto top-1/2 transform -translate-y-1/2 text-gray-400"
-              />
-              <input
-                type="text"
-                placeholder={t("header.search")}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 rtl:pr-10 rtl:pl-4 pr-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-              />
-            </div>
-
-            <div className="flex items-center gap-3">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent"
-              >
-                <option value="featured">{isRtl ? "مميز" : "Featured"}</option>
-                <option value="price-low">
-                  {isRtl ? "السعر: منخفض إلى مرتفع" : "Price: Low to High"}
-                </option>
-                <option value="price-high">
-                  {isRtl ? "السعر: مرتفع إلى منخفض" : "Price: High to Low"}
-                </option>
-                <option value="name">{isRtl ? "الاسم" : "Name"}</option>
-              </select>
-
-              <div className="flex bg-gray-100 rounded-xl p-1">
+      {/* Mobile Filters Modal */}
+      <AnimatePresence>
+        {showMobileFilters && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowMobileFilters(false)}
+          >
+            <motion.div
+              initial={{ x: isRtl ? "100%" : "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: isRtl ? "100%" : "-100%" }}
+              className={`fixed inset-y-0 ${
+                isRtl ? "right-0" : "left-0"
+              } w-11/12 sm:w-80 bg-white shadow-2xl overflow-y-auto p-6 rounded-l-2xl lg:rounded-none transition-transform duration-300 ease-out`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6 border-b border-neutral-200 pb-3">
+                <h3 className="flex items-center gap-2 text-lg font-bold text-purple-800">
+                  <Filter size={18} />
+                  {isRtl ? "فلاتر البحث" : "Search Filters"}
+                </h3>
                 <button
-                  onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded-lg transition-all ${
-                    viewMode === "grid"
-                      ? "bg-white shadow-sm text-primary"
-                      : "text-gray-500"
-                  }`}
+                  onClick={() => setShowMobileFilters(false)}
+                  className="p-2 hover:bg-neutral-100 rounded-full transition-colors text-neutral-600"
                 >
-                  <Grid size={18} />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`p-2 rounded-lg transition-all ${
-                    viewMode === "list"
-                      ? "bg-white shadow-sm text-primary"
-                      : "text-gray-500"
-                  }`}
-                >
-                  <List size={18} />
+                  <X size={18} />
                 </button>
               </div>
 
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-dark transition-all"
-              >
-                <Filter size={18} />
-                {isRtl ? "فلتر" : "Filter"}
-              </button>
-            </div>
-          </div>
-
-          <AnimatePresence>
-            {showFilters && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mt-4 p-4 bg-gray-50 rounded-2xl"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {isRtl ? "نطاق السعر" : "Price Range"}
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        value={priceRange[0]}
-                        onChange={(e) =>
-                          setPriceRange([
-                            parseInt(e.target.value) || 0,
-                            priceRange[1],
-                          ])
-                        }
-                        className="w-20 px-2 py-1 border border-gray-300 rounded-lg text-sm"
-                        placeholder="0"
-                      />
-                      <span className="text-gray-500">-</span>
-                      <input
-                        type="number"
-                        value={priceRange[1]}
-                        onChange={(e) =>
-                          setPriceRange([
-                            priceRange[0],
-                            parseInt(e.target.value) || 1000,
-                          ])
-                        }
-                        className="w-20 px-2 py-1 border border-gray-300 rounded-lg text-sm"
-                        placeholder="1000"
-                      />
-                    </div>
+              <div className="space-y-5">
+                <div>
+                  <h4 className="flex items-center gap-2 text-sm font-bold text-neutral-800 mb-3">
+                    <Sparkles size={16} className="text-purple-600" />
+                    {isRtl ? "فلاتر سريعة" : "Quick Filters"}
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {quickFilterOptions.map((option) => (
+                      <button
+                        key={option.id}
+                        onClick={() => toggleQuickFilter(option.id)}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium border transition-all duration-200 ${
+                          quickFilters.includes(option.id)
+                            ? option.color
+                            : "bg-neutral-50 text-neutral-600 border-neutral-200 hover:bg-neutral-100"
+                        }`}
+                      >
+                        {option.icon}
+                        {option.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
 
-      <div className="container-custom py-8">
-        {!slug && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-              {isRtl ? "تصفح الفئات" : "Browse Categories"}
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {filteredCategories.map((category, index) => (
-                <div key={category.id}>
-                  <Link to={`/category/${category.id}`} className="group block">
-                    <div className="relative aspect-square overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 to-secondary/10 shadow-lg hover:shadow-2xl transition-all duration-500">
-                      <ProductImage
-                        src={category.imageUrl}
-                        alt={t(category.nameKey)}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        width={200}
-                        height={200}
-                        aspectRatio="square"
-                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 16.66vw, 200px"
-                        quality={85}
-                        priority={index < 6}
-                        showZoom={false}
-                        placeholderSize={24}
-                        fallbackSrc="https://images.pexels.com/photos/1058775/pexels-photo-1058775.jpeg?auto=compress&cs=tinysrgb&w=400"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                        <h3 className="text-white font-bold text-center text-sm md:text-base drop-shadow-lg">
+                <div>
+                  <h4 className="flex items-center gap-2 text-sm font-bold text-neutral-800 mb-3">
+                    <Filter size={16} className="text-purple-600" />
+                    {isRtl ? "الفئات" : "Categories"}
+                  </h4>
+                  <div className="space-y-3">
+                    {filterOptions.categories.map((category) => (
+                      <label
+                        key={category.id}
+                        className="flex items-center gap-3 text-sm text-neutral-700 cursor-pointer hover:text-purple-600 transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={filters.categories.includes(category.id)}
+                          onChange={() =>
+                            toggleArrayFilter("categories", category.id)
+                          }
+                          className="rounded border-neutral-300 text-purple-500 focus:ring-purple-500 w-4 h-4"
+                        />
+                        <span className="font-medium">
                           {t(category.nameKey)}
-                        </h3>
-                      </div>
-                      <div className="absolute top-2 right-2 w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <Eye size={16} className="text-white" />
-                      </div>
-                    </div>
-                  </Link>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
 
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-800">
-            {isRtl ? "المنتجات" : "Products"}
-            <span className="text-primary ml-2">({sortedProducts.length})</span>
-          </h2>
-        </div>
+                <div>
+                  <h4 className="flex items-center gap-2 text-sm font-bold text-neutral-800 mb-3">
+                    <DollarSign size={16} className="text-purple-600" />
+                    {isRtl ? "نطاق السعر" : "Price Range"}
+                  </h4>
+                  <div className="space-y-3">
+                    {priceRanges.map((rangeOption) => (
+                      <label
+                        key={rangeOption.id}
+                        className="flex items-center gap-3 text-sm text-neutral-700 cursor-pointer hover:text-purple-600 transition-colors"
+                      >
+                        <input
+                          type="radio"
+                          name="priceRange"
+                          checked={
+                            filters.priceRange[0] === rangeOption.range[0] &&
+                            filters.priceRange[1] === rangeOption.range[1]
+                          }
+                          onChange={() =>
+                            handlePriceRangeSelect(
+                              rangeOption.range[0],
+                              rangeOption.range[1]
+                            )
+                          }
+                          className="rounded-full border-neutral-300 text-purple-500 focus:ring-purple-500 w-4 h-4"
+                        />
+                        <span className="font-medium">{rangeOption.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
 
-        <AnimatePresence mode="wait">
-          {viewMode === "grid" ? (
-            <motion.div
-              key="grid"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-            >
-              {sortedProducts.map((product, index) => (
-                <div
-                  key={product.id}
-                  className="group relative bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden"
+                <div>
+                  <h4 className="flex items-center gap-2 text-sm font-bold text-neutral-800 mb-3">
+                    <Sparkles size={16} className="text-purple-600" />
+                    {isRtl ? "المميزات" : "Features"}
+                  </h4>
+                  <div className="space-y-3">
+                    {filterOptions.features.map((feature) => (
+                      <label
+                        key={feature.id}
+                        className="flex items-center gap-3 text-sm text-neutral-700 cursor-pointer hover:text-purple-600 transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={filters.features.includes(feature.id)}
+                          onChange={() =>
+                            toggleArrayFilter("features", feature.id)
+                          }
+                          className="rounded border-neutral-300 text-purple-500 focus:ring-purple-500 w-4 h-4"
+                        />
+                        <span className="font-medium">{feature.nameKey}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-5 border-t border-neutral-200 space-y-3">
+                <div className="text-sm text-neutral-600 text-center font-medium">
+                  {filteredProducts.length}{" "}
+                  {isRtl ? "منتج موجود" : "products found"}
+                </div>
+                <button
+                  onClick={clearFilters}
+                  className="w-full px-4 py-3 bg-rose-50 text-rose-700 rounded-lg hover:bg-rose-100 transition-colors flex items-center justify-center gap-2 font-bold text-sm shadow-sm"
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <ProductImage
-                      src={product.imageUrl}
-                      alt={isRtl ? product.nameAr : product.nameEn}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                      width={320}
-                      height={240}
-                      aspectRatio="landscape"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      quality={80}
-                      priority={index < 8}
-                      showZoom={false}
-                      placeholderSize={28}
-                      fallbackSrc="https://images.pexels.com/photos/1058775/pexels-photo-1058775.jpeg?auto=compress&cs=tinysrgb&w=400"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute top-3 left-3 rtl:right-3 rtl:left-auto flex flex-col gap-2">
-                      {product.isBestSeller && (
-                        <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold py-1 px-3 rounded-full flex items-center gap-1">
-                          {t("home.bestSellers.bestSeller")}
-                        </div>
-                      )}
-                      {product.isSpecialGift && (
-                        <div className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold py-1 px-3 rounded-full">
-                          {t("home.featuredCollections.specialGift")}
-                        </div>
-                      )}
-                    </div>
-                    <div className="absolute top-3 right-3 rtl:left-3 rtl:right-auto flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
-                      <FavoriteButton
-                        product={product}
-                        className="w-10 h-10 rounded-full backdrop-blur-sm border border-white/20 shadow-lg"
-                        size={16}
-                      />
-                    </div>
-                    <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                      <div className="flex gap-2">
-                        <AddToCartButton
-                          product={product}
-                          variant="primary"
-                          size="sm"
-                          className="flex-1"
-                          showLabel={false}
-                        />
-                        <Link
-                          to={`/product/${product.id}`}
-                          className="bg-white/90 backdrop-blur-sm text-gray-800 py-2 px-4 rounded-xl font-medium text-center hover:bg-white transition-all duration-300 shadow-lg"
-                        >
-                          {isRtl ? "عرض" : "View"}
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <Link to={`/product/${product.id}`} className="block">
-                      <h3 className="font-bold text-gray-800 hover:text-primary transition-colors line-clamp-2 mb-2">
-                        {isRtl ? product.nameAr : product.nameEn}
-                      </h3>
-                    </Link>
-                    <div className="flex items-center justify-between">
-                      <p className="text-xl font-bold text-primary">
-                        {product.price} {isRtl ? "ر.س" : "SAR"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          ) : (
-            <motion.div
-              key="list"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="space-y-4"
-            >
-              {sortedProducts.map((product, index) => (
-                <div
-                  key={product.id}
-                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+                  <X size={16} />
+                  {isRtl ? "مسح الفلاتر" : "Clear Filters"}
+                </button>
+                <button
+                  onClick={() => setShowMobileFilters(false)}
+                  className="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 font-bold text-sm shadow-md"
                 >
-                  <div className="flex">
-                    <div className="w-32 h-32 flex-shrink-0">
-                      <ProductImage
-                        src={product.imageUrl}
-                        alt={isRtl ? product.nameAr : product.nameEn}
-                        className="w-full h-full object-cover"
-                        width={128}
-                        height={128}
-                        aspectRatio="square"
-                        sizes="128px"
-                        quality={80}
-                        priority={index < 4}
-                        showZoom={false}
-                        placeholderSize={24}
-                        fallbackSrc="https://images.pexels.com/photos/1058775/pexels-photo-1058775.jpeg?auto=compress&cs=tinysrgb&w=400"
-                      />
-                    </div>
-                    <div className="flex-1 p-4 flex items-center justify-between">
-                      <div>
-                        <Link to={`/product/${product.id}`}>
-                          <h3 className="font-bold text-gray-800 hover:text-primary transition-colors mb-1">
-                            {isRtl ? product.nameAr : product.nameEn}
-                          </h3>
-                        </Link>
-                        <p className="text-primary font-bold text-lg">
-                          {product.price} {isRtl ? "ر.س" : "SAR"}
-                        </p>
-                        <div className="flex items-center gap-2 mt-2">
-                          {product.isBestSeller && (
-                            <span className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full">
-                              {t("home.bestSellers.bestSeller")}
-                            </span>
-                          )}
-                          {product.isSpecialGift && (
-                            <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
-                              {t("home.featuredCollections.specialGift")}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <FavoriteButton
-                          product={product}
-                          className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
-                          size={18}
-                        />
-                        <AddToCartButton
-                          product={product}
-                          variant="primary"
-                          size="sm"
-                          showLabel={false}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  <CheckCircle size={16} />
+                  {isRtl ? "تطبيق الفلاتر" : "Apply Filters"}
+                </button>
+              </div>
             </motion.div>
-          )}
-        </AnimatePresence>
-
-        {sortedProducts.length === 0 && (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search size={40} className="text-gray-500" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">
-              {isRtl ? "لا توجد منتجات" : "No Products Found"}
-            </h3>
-            <p className="text-gray-600 mb-6">
-              {isRtl
-                ? "لا توجد منتجات متاحة لهذه الفئة أو البحث."
-                : "No products available for this category or search."}
-            </p>
-            <Link to="/categories" className="btn btn-primary">
-              {t("home.categories.title")}
-            </Link>
-          </div>
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
     </div>
   );
 };
