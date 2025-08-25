@@ -31,7 +31,7 @@ const ProductImage: React.FC<ProductImageProps> = ({
   width = 400,
   height = 400,
   sizes,
-  quality = 75,
+  quality = 100,
   enableBlurUp = true,
   threshold = 0.1,
   rootMargin = "100px",

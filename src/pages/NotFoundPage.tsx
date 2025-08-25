@@ -20,7 +20,7 @@ const NotFoundPage: React.FC = () => {
             height={256}
             aspectRatio="square"
             sizes="256px"
-            quality={85}
+            quality={100}
             priority={true}
             showZoom={false}
           />

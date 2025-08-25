@@ -24,7 +24,7 @@ const AboutPage: React.FC = () => {
                 height={400}
                 aspectRatio="landscape"
                 sizes="(max-width: 768px) 100vw, 50vw"
-                quality={85}
+                quality={100}
                 priority={true}
                 showZoom={false}
               />
@@ -76,7 +76,7 @@ const AboutPage: React.FC = () => {
                   height={128}
                   aspectRatio="landscape"
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  quality={75}
+                  quality={100}
                   showZoom={false}
                 />
               </div>
@@ -104,7 +104,7 @@ const AboutPage: React.FC = () => {
                   height={128}
                   aspectRatio="landscape"
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  quality={75}
+                  quality={100}
                   showZoom={false}
                 />
               </div>
@@ -130,7 +130,7 @@ const AboutPage: React.FC = () => {
                   height={128}
                   aspectRatio="landscape"
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  quality={75}
+                  quality={100}
                   showZoom={false}
                 />
               </div>
@@ -185,7 +185,7 @@ const AboutPage: React.FC = () => {
                 height={400}
                 aspectRatio="landscape"
                 sizes="(max-width: 768px) 100vw, 800px"
-                quality={85}
+                quality={100}
                 showZoom={false}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent rounded-2xl flex items-end justify-center pb-8">

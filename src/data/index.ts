@@ -79,11 +79,45 @@ export const occasionProducts = {
 
 // Helper functions
 export const getProductsByCategory = (categoryId: string) => {
-  return categoryProducts[categoryId as keyof typeof categoryProducts] || [];
+  // Get products from both category-specific files and all products that match the category
+  const categorySpecificProducts =
+    categoryProducts[categoryId as keyof typeof categoryProducts] || [];
+  const allCategoryProducts = allProducts.filter(
+    (product) => product.categoryId === categoryId
+  );
+
+  // Combine and deduplicate based on product ID
+  const combinedProducts = [
+    ...categorySpecificProducts,
+    ...allCategoryProducts,
+  ];
+  const uniqueProducts = combinedProducts.filter(
+    (product, index, self) =>
+      index === self.findIndex((p) => p.id === product.id)
+  );
+
+  return uniqueProducts;
 };
 
 export const getProductsByOccasion = (occasionId: string) => {
-  return occasionProducts[occasionId as keyof typeof occasionProducts] || [];
+  // Get products from both occasion-specific files and all products that match the occasion
+  const occasionSpecificProducts =
+    occasionProducts[occasionId as keyof typeof occasionProducts] || [];
+  const allOccasionProducts = allProducts.filter(
+    (product) => product.occasionId === occasionId
+  );
+
+  // Combine and deduplicate based on product ID
+  const combinedProducts = [
+    ...occasionSpecificProducts,
+    ...allOccasionProducts,
+  ];
+  const uniqueProducts = combinedProducts.filter(
+    (product, index, self) =>
+      index === self.findIndex((p) => p.id === product.id)
+  );
+
+  return uniqueProducts;
 };
 
 export const getBestSellers = () => {

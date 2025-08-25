@@ -167,7 +167,7 @@ const CategoriesSection: React.FC = () => {
                         height={144}
                         aspectRatio="square"
                         sizes="(max-width: 767px) 144px, 192px"
-                        quality={75}
+                        quality={100}
                         priority={index < 3}
                         showZoom={false}
                         placeholderSize={28}

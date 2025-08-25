@@ -164,7 +164,7 @@ const FeaturedCollectionsSection: React.FC = () => {
                         height={160}
                         aspectRatio="square"
                         sizes="(max-width: 767px) 160px, 192px"
-                        quality={80}
+                        quality={100}
                         priority={index < 3}
                         showZoom={false}
                         placeholderSize={28}

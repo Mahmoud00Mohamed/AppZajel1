@@ -750,7 +750,7 @@ const NotificationsPage: React.FC = () => {
                       height={40}
                       aspectRatio="square"
                       sizes="40px"
-                      quality={75}
+                      quality={100}
                       showZoom={false}
                     />
                     <div className="flex-1">

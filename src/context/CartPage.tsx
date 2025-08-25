@@ -61,7 +61,7 @@ const CartPage: React.FC = () => {
                     height={80}
                     aspectRatio="square"
                     sizes="80px"
-                    quality={75}
+                    quality={100}
                     showZoom={false}
                   />
                   <div className="flex-grow">

@@ -104,7 +104,7 @@ const ContactPage: React.FC = () => {
                 height={338}
                 aspectRatio="landscape"
                 sizes="(max-width: 768px) 100vw, 50vw"
-                quality={80}
+                quality={100}
                 priority={true}
                 showZoom={false}
               />

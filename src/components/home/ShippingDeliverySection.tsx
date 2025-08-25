@@ -98,7 +98,7 @@ const ShippingDeliverySection: React.FC = () => {
                 height={750}
                 aspectRatio="square"
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                quality={85}
+                quality={100}
                 priority={false}
                 showZoom={false}
                 placeholderSize={50}

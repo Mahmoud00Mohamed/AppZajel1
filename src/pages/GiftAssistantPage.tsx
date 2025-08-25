@@ -744,7 +744,7 @@ const GiftAssistantPage: React.FC = () => {
                     height={300}
                     aspectRatio="square"
                     sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 300px"
-                    quality={85}
+                    quality={100}
                     priority={index < 8}
                     showZoom={false}
                   />

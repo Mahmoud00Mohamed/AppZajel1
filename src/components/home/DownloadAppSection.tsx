@@ -120,7 +120,7 @@ const DownloadAppSection: React.FC = () => {
                 height={300}
                 aspectRatio="square"
                 sizes="(max-width: 768px) 300px, 400px"
-                quality={90}
+                quality={100}
                 priority={false}
                 showZoom={false}
                 placeholderSize={40}

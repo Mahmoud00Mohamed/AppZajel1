@@ -292,7 +292,7 @@ const FavoritesPage: React.FC = () => {
                         height={160}
                         aspectRatio="square"
                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 160px"
-                        quality={75}
+                        quality={100}
                         priority={false}
                         showZoom={false}
                         placeholderSize={24}
@@ -537,7 +537,7 @@ const FavoritesPage: React.FC = () => {
                             height={200}
                             aspectRatio="square"
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 200px"
-                            quality={80}
+                            quality={100}
                             priority={index < 10}
                             showZoom={false}
                             placeholderSize={24}
@@ -644,7 +644,7 @@ const FavoritesPage: React.FC = () => {
                               height={128}
                               aspectRatio="square"
                               sizes="128px"
-                              quality={85}
+                              quality={100}
                               priority={index < 5}
                               showZoom={false}
                               placeholderSize={24}
@@ -755,7 +755,7 @@ const FavoritesPage: React.FC = () => {
                           height={160}
                           aspectRatio="square"
                           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 160px"
-                          quality={75}
+                          quality={100}
                           priority={false}
                           showZoom={false}
                           placeholderSize={20}

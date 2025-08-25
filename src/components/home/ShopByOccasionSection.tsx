@@ -33,12 +33,12 @@ const OccasionCard: React.FC<{ occasion: Occasion; isFixed?: boolean }> = ({
         <ProductImage
           src={occasion.imageUrl}
           alt={t(occasion.nameKey)}
-          className="w-full  h-full object-cover rounded-[20px]"
+          className="w-full  h-full  rounded-[20px]"
           width={120}
           height={120}
           aspectRatio="square"
           sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
-          quality={85}
+          quality={100}
           priority={true}
           showZoom={false}
           placeholderSize={24}

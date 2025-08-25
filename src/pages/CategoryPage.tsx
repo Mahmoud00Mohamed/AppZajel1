@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import categories from "../data/categories.json";
-import { allProducts, getProductsByCategory } from "../data";
+import { allProducts } from "../data";
 import { ProductImage } from "../features/images";
 import FavoriteButton from "../components/ui/FavoriteButton";
 import AddToCartButton from "../components/ui/AddToCartButton";
@@ -136,7 +136,7 @@ const CategoryPage: React.FC = () => {
   );
 
   const filteredProducts = useMemo(() => {
-    let products = slug ? getProductsByCategory(slug) : allProducts;
+    let products = allProducts;
 
     if (searchTerm) {
       products = products.filter((product) =>
@@ -146,10 +146,14 @@ const CategoryPage: React.FC = () => {
       );
     }
 
-    if (filters.categories.length > 0) {
+    // Apply category filter - either from slug or from filters
+    const categoriesToFilter = slug
+      ? [slug, ...filters.categories.filter((c) => c !== slug)]
+      : filters.categories;
+    if (categoriesToFilter.length > 0) {
       products = products.filter(
         (product) =>
-          product.categoryId && filters.categories.includes(product.categoryId)
+          product.categoryId && categoriesToFilter.includes(product.categoryId)
       );
     }
 
@@ -700,7 +704,7 @@ const CategoryPage: React.FC = () => {
                             height={200}
                             aspectRatio="square"
                             sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 16.66vw, 200px"
-                            quality={75}
+                            quality={100}
                             priority={index < 6}
                             showZoom={false}
                             placeholderSize={24}
@@ -745,7 +749,7 @@ const CategoryPage: React.FC = () => {
                               height={180}
                               aspectRatio="landscape"
                               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                              quality={75}
+                              quality={100}
                               priority={index < 8}
                               showZoom={false}
                               placeholderSize={28}
@@ -820,7 +824,7 @@ const CategoryPage: React.FC = () => {
                             height={112}
                             aspectRatio="square"
                             sizes="112px"
-                            quality={75}
+                            quality={100}
                             priority={index < 4}
                             showZoom={false}
                           />
