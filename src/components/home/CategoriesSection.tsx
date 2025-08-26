@@ -1,8 +1,8 @@
-import React, { useRef, useEffect, useState, useMemo } from "react";
+import React, { useRef, useEffect, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ChevronRight, ChevronLeft } from "lucide-react";
-import categoriesData from "../../data/categories.json";
+import categories from "../../data/categories.json";
 import { ProductImage } from "../../features/images";
 import { useImagePreloader } from "../../features/images";
 
@@ -12,41 +12,93 @@ interface Category {
   imageUrl: string;
 }
 
-const categories: Category[] = categoriesData;
-
 const CategoriesSection: React.FC = () => {
   const { t, i18n } = useTranslation();
   const isRtl = i18n.language === "ar";
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  const categoryImages = useMemo(
+  const categoryImages = React.useMemo(
     () => categories.slice(0, 8).map((category) => category.imageUrl),
     []
   );
   useImagePreloader(categoryImages, { priority: true });
 
-  // For mobile marquee effect, we need to duplicate the items
-  const displayCategories = useMemo(() => {
-    if (isMobile) {
-      return [...categories, ...categories];
-    }
-    return categories;
-  }, [isMobile]);
+  const handle3dScrollEffect = useCallback(() => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
 
-  // Animation duration calculated based on the number of items for consistent speed
-  const animationDuration = `${categories.length * 5}s`;
+    if (window.innerWidth >= 768) {
+      (Array.from(scrollContainer.children) as HTMLElement[]).forEach(
+        (card) => {
+          card.style.transform = "";
+          card.style.transition = "";
+        }
+      );
+      return;
+    }
+
+    const containerViewportCenter =
+      scrollContainer.getBoundingClientRect().left +
+      scrollContainer.offsetWidth / 2;
+
+    (Array.from(scrollContainer.children) as HTMLElement[]).forEach((card) => {
+      const cardRect = card.getBoundingClientRect();
+      const cardCenter = cardRect.left + cardRect.width / 2;
+      const distance = cardCenter - containerViewportCenter;
+
+      const maxDistance = scrollContainer.offsetWidth / 2;
+      const ratio = Math.min(Math.max(distance / maxDistance, -1), 1);
+
+      const scale = 1 - Math.abs(ratio) * 0.3;
+      const rotateY = ratio * -45;
+      const translateY = Math.abs(ratio) * -30;
+      const opacity = 1 - Math.abs(ratio) * 0.4;
+
+      card.style.transform = `scale(${scale}) rotateY(${rotateY}deg) translateY(${translateY}px)`;
+      card.style.transition = "transform 0.5s ease-out, opacity 0.5s ease-out";
+      card.style.opacity = `${opacity}`;
+    });
+  }, []);
 
   useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (scrollContainer && window.innerWidth < 768) {
+      const cardWidth = 160 + 16;
+      const middleIndex = Math.floor(categories.length / 2);
+      const scrollPosition =
+        middleIndex * cardWidth -
+        scrollContainer.offsetWidth / 2 +
+        cardWidth / 2;
+      scrollContainer.scrollLeft = isRtl ? -scrollPosition : scrollPosition;
+    }
+  }, [isRtl]);
+
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (scrollContainer) {
+      handle3dScrollEffect();
+      scrollContainer.addEventListener("scroll", handle3dScrollEffect, {
+        passive: true,
+      });
+      window.addEventListener("resize", handle3dScrollEffect);
+    }
+
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener("scroll", handle3dScrollEffect);
+      }
+      window.removeEventListener("resize", handle3dScrollEffect);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [handle3dScrollEffect]);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      // Desktop scrolling remains unchanged
-      const cardWidth = 192 + 8;
+      const cardWidth = window.innerWidth >= 768 ? 192 + 8 : 160 + 16;
       scrollRef.current.scrollBy({
         left: isRtl
           ? direction === "left"
@@ -63,20 +115,8 @@ const CategoriesSection: React.FC = () => {
   const prevDirection = isRtl ? "right" : "left";
   const nextDirection = isRtl ? "left" : "right";
 
-  const marqueeKeyframes = `
-    @keyframes marquee-ltr {
-      from { transform: translateX(0%); }
-      to { transform: translateX(-50%); }
-    }
-    @keyframes marquee-rtl {
-      from { transform: translateX(0%); }
-      to { transform: translateX(50%); }
-    }
-  `;
-
   return (
-    <section className="py-0 bg-white">
-      <style>{marqueeKeyframes}</style>
+    <section className="py-0">
       <div className="container-custom px-4 sm:px-6">
         <div className="text-center mb-10">
           <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-medium text-purple-800 leading-tight">
@@ -104,77 +144,50 @@ const CategoriesSection: React.FC = () => {
           >
             <ChevronRight size={18} />
           </button>
-
           <div
             ref={scrollRef}
-            className={`
-              ${
-                isMobile
-                  ? "overflow-hidden"
-                  : "flex overflow-x-auto gap-x-2 pb-4 scroll-smooth md:px-4"
-              }
-            `}
-            // Add a gradient mask for mobile for a fade-out effect
-            style={
-              isMobile
-                ? {
-                    maskImage:
-                      "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)",
-                    WebkitMaskImage:
-                      "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)",
-                  }
-                : {}
-            }
+            className="flex overflow-x-auto gap-x-4 pb-4 snap-x snap-mandatory scroll-smooth 
+                         px-[calc(50%-5rem)] sm:px-[calc(50%-5rem)] md:px-4 
+                         md:gap-x-2"
+            style={{
+              perspective: "1200px",
+              WebkitOverflowScrolling: "touch",
+              scrollbarWidth: isMobile ? "none" : "thin",
+              scrollbarColor: isMobile ? "transparent" : "#8A2BE2 transparent",
+            }}
           >
-            <div
-              className={`
-                ${isMobile ? "flex group" : "contents"}
-              `}
-              style={
-                isMobile
-                  ? {
-                      width: `${categories.length * 2 * 10}rem`, // 2x items * 10rem width per item (w-40)
-                      animation: `${
-                        isRtl ? "marquee-rtl" : "marquee-ltr"
-                      } ${animationDuration} linear infinite`,
-                    }
-                  : {}
-              }
-            >
-              {displayCategories.map((category: Category, index) => (
-                <div
-                  key={`${category.id}-${index}`}
-                  className="flex-shrink-0 w-40 sm:w-40 md:w-48 touch-manipulation px-2 md:px-0 group-hover:[animation-play-state:paused]"
-                  style={isMobile ? {} : { flex: "0 0 auto" }}
-                >
-                  <Link to={`/category/${category.id}`}>
-                    <div className="bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-[box-shadow,border-color] duration-300 overflow-hidden group">
-                      <div className="relative aspect-square overflow-hidden rounded-t-xl">
-                        <ProductImage
-                          src={category.imageUrl}
-                          alt={t(category.nameKey)}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-2"
-                          width={160}
-                          height={160}
-                          aspectRatio="square"
-                          sizes="(max-width: 767px) 160px, 192px"
-                          quality={100}
-                          priority={index < 3}
-                          showZoom={false}
-                          placeholderSize={28}
-                          fallbackSrc="https://images.pexels.com/photos/1058775/pexels-photo-1058775.jpeg?auto=compress&cs=tinysrgb&w=400"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end justify-center p-4 transition-opacity duration-300 group-hover:opacity-90">
-                          <h3 className="text-base font-semibold text-white text-center transform transition-transform duration-300 group-hover:-translate-y-1">
-                            {t(category.nameKey)}
-                          </h3>
-                        </div>
+            {categories.map((category: Category, index) => (
+              <div
+                key={category.id}
+                className="flex-shrink-0 w-40 sm:w-40 md:w-48 snap-center touch-manipulation"
+              >
+                <Link to={`/category/${category.id}`}>
+                  <div className="bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-[box-shadow,border-color] duration-300 overflow-hidden group">
+                    <div className="relative aspect-square overflow-hidden rounded-t-xl">
+                      <ProductImage
+                        src={category.imageUrl}
+                        alt={t(category.nameKey)}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-2"
+                        width={160}
+                        height={160}
+                        aspectRatio="square"
+                        sizes="(max-width: 767px) 160px, 192px"
+                        quality={100}
+                        priority={index < 3}
+                        showZoom={false}
+                        placeholderSize={28}
+                        fallbackSrc="https://images.pexels.com/photos/1058775/pexels-photo-1058775.jpeg?auto=compress&cs=tinysrgb&w=400"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end justify-center p-4 transition-opacity duration-300 group-hover:opacity-90">
+                        <h3 className="text-base font-semibold text-white text-center transform transition-transform duration-300 group-hover:-translate-y-1">
+                          {t(category.nameKey)}
+                        </h3>
                       </div>
                     </div>
-                  </Link>
-                </div>
-              ))}
-            </div>
+                  </div>
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -8,7 +8,7 @@ const MagicGiftSection: React.FC = () => {
   const isRtl = i18n.language === "ar";
 
   return (
-    <section className="py-14 sm:py-18 bg-white">
+    <section className="py-14 sm:py-18 ">
       <div className="container-custom px-4 sm:px-6">
         <div className="relative bg-gradient-to-br from-purple-50 to-white rounded-xl shadow-md border border-gray-200 p-6 md:p-10 text-center overflow-hidden">
           <div className="relative z-10">

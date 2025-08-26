@@ -192,7 +192,7 @@ const HeroSlider: React.FC = () => {
   if (allSlides.length === 0) return null;
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white">
+    <section className="relative overflow-hidden">
       {isOccasionActive && currentSlideData?.type === "occasion" && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <Confetti

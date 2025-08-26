@@ -32,7 +32,7 @@ const HomePage: React.FC = () => {
   }, [t]);
 
   return (
-    <div className="bg-white">
+    <div className="bg-gradient-to-br from-rose-50 to-purple-50">
       <Suspense fallback={<div>Loading...</div>}>
         <HeroSlider />
         <ShopByOccasionSection />

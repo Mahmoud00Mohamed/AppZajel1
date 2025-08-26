@@ -58,7 +58,7 @@ const DownloadAppSection: React.FC = () => {
   );
 
   return (
-    <section className="py-14  sm:py-18 bg-white">
+    <section className="py-14  sm:py-18 ">
       <div className="container-custom px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className={`${isRtl ? "lg:order-2" : "lg:order-1"}`}>
