@@ -24,11 +24,12 @@ const CategoriesSection: React.FC = () => {
   );
   useImagePreloader(categoryImages, { priority: true });
 
+  // تأثير 3D
   const handle3dScrollEffect = useCallback(() => {
     const scrollContainer = scrollRef.current;
     if (!scrollContainer) return;
 
-    if (window.innerWidth >= 768) {
+    if (!isMobile) {
       (Array.from(scrollContainer.children) as HTMLElement[]).forEach(
         (card) => {
           card.style.transform = "";
@@ -59,30 +60,27 @@ const CategoriesSection: React.FC = () => {
       card.style.transition = "transform 0.5s ease-out, opacity 0.5s ease-out";
       card.style.opacity = `${opacity}`;
     });
-  }, []);
+  }, [isMobile]);
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
-    if (!scrollContainer || window.innerWidth >= 768) return;
+    if (scrollContainer && isMobile) {
+      const cardWidth = 160 + 16;
+      const middleIndex = Math.floor(categories.length / 2);
+      let scrollPosition =
+        middleIndex * cardWidth -
+        scrollContainer.offsetWidth / 2 +
+        cardWidth / 2;
 
-    const cardWidth = 160 + 16; // عرض الكارت + المسافة
-    const totalCards = categories.length;
+      // الحد الأقصى للتمرير
+      const maxScrollLeft =
+        scrollContainer.scrollWidth - scrollContainer.offsetWidth;
+      if (scrollPosition > maxScrollLeft) scrollPosition = maxScrollLeft;
+      if (scrollPosition < 0) scrollPosition = 0;
 
-    // نحاول مركزية آخر كارت
-    const lastCardIndex = totalCards - 1;
-    let scrollPosition =
-      lastCardIndex * cardWidth -
-      scrollContainer.offsetWidth / 2 +
-      cardWidth / 2;
-
-    // الحد الأقصى للتمرير
-    const maxScrollLeft =
-      scrollContainer.scrollWidth - scrollContainer.offsetWidth;
-    if (scrollPosition > maxScrollLeft) scrollPosition = maxScrollLeft;
-    if (scrollPosition < 0) scrollPosition = 0;
-
-    scrollContainer.scrollLeft = isRtl ? -scrollPosition : scrollPosition;
-  }, [isRtl]);
+      scrollContainer.scrollLeft = isRtl ? -scrollPosition : scrollPosition;
+    }
+  }, [isRtl, isMobile]);
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
@@ -107,19 +105,19 @@ const CategoriesSection: React.FC = () => {
   }, [handle3dScrollEffect]);
 
   const scroll = (direction: "left" | "right") => {
-    if (scrollRef.current) {
-      const cardWidth = window.innerWidth >= 768 ? 192 + 8 : 160 + 16;
-      scrollRef.current.scrollBy({
-        left: isRtl
-          ? direction === "left"
-            ? cardWidth
-            : -cardWidth
-          : direction === "left"
-          ? -cardWidth
-          : cardWidth,
-        behavior: "smooth",
-      });
-    }
+    if (!scrollRef.current) return;
+
+    const cardWidth = isMobile ? 160 + 16 : 192 + 8;
+    scrollRef.current.scrollBy({
+      left: isRtl
+        ? direction === "left"
+          ? cardWidth
+          : -cardWidth
+        : direction === "left"
+        ? -cardWidth
+        : cardWidth,
+      behavior: "smooth",
+    });
   };
 
   const prevDirection = isRtl ? "right" : "left";
@@ -154,11 +152,12 @@ const CategoriesSection: React.FC = () => {
           >
             <ChevronRight size={18} />
           </button>
+
           <div
             ref={scrollRef}
             className="flex overflow-x-auto gap-x-4 pb-4 snap-x snap-mandatory scroll-smooth 
-                         px-[calc(50%-5rem)] sm:px-[calc(50%-5rem)] md:px-4 
-                         md:gap-x-2"
+                       px-[calc(50%-5rem)] sm:px-[calc(50%-5rem)] md:px-4 
+                       md:gap-x-2"
             style={{
               perspective: "1200px",
               WebkitOverflowScrolling: "touch",
@@ -198,6 +197,11 @@ const CategoriesSection: React.FC = () => {
                 </Link>
               </div>
             ))}
+
+            {/* كارت وهمي Spacer بعد آخر كارت للهواتف */}
+            {isMobile && (
+              <div className="flex-shrink-0 w-40 sm:w-40 md:w-48 snap-center touch-manipulation pointer-events-none" />
+            )}
           </div>
         </div>
       </div>
