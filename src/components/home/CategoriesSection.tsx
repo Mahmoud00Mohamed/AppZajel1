@@ -32,6 +32,7 @@ const CategoriesSection: React.FC = () => {
       (Array.from(scrollContainer.children) as HTMLElement[]).forEach(
         (card) => {
           card.style.transform = "";
+          card.style.transition = "";
         }
       );
       return;
@@ -49,17 +50,21 @@ const CategoriesSection: React.FC = () => {
       const maxDistance = scrollContainer.offsetWidth / 2;
       const ratio = Math.min(Math.max(distance / maxDistance, -1), 1);
 
-      const scale = 1 - Math.abs(ratio) * 0.35;
-      const rotateY = ratio * -35;
+      const scale = 1 - Math.abs(ratio) * 0.3;
+      const rotateY = ratio * -45;
+      const translateY = Math.abs(ratio) * -30;
+      const opacity = 1 - Math.abs(ratio) * 0.4;
 
-      card.style.transform = `scale(${scale}) rotateY(${rotateY}deg)`;
+      card.style.transform = `scale(${scale}) rotateY(${rotateY}deg) translateY(${translateY}px)`;
+      card.style.transition = "transform 0.5s ease-out, opacity 0.5s ease-out";
+      card.style.opacity = `${opacity}`;
     });
   }, []);
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
     if (scrollContainer && window.innerWidth < 768) {
-      const cardWidth = 144 + 12;
+      const cardWidth = 160 + 16;
       const middleIndex = Math.floor(categories.length / 2);
       const scrollPosition =
         middleIndex * cardWidth -
@@ -93,7 +98,7 @@ const CategoriesSection: React.FC = () => {
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      const cardWidth = window.innerWidth >= 768 ? 192 + 8 : 144 + 12; // card width + gap
+      const cardWidth = window.innerWidth >= 768 ? 192 + 8 : 160 + 16;
       scrollRef.current.scrollBy({
         left: isRtl
           ? direction === "left"
@@ -111,13 +116,13 @@ const CategoriesSection: React.FC = () => {
   const nextDirection = isRtl ? "left" : "right";
 
   return (
-    <section className="py-0 bg-white">
+    <section className="py-0  bg-white">
       <div className="container-custom px-4 sm:px-6">
         <div className="text-center mb-10">
           <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-medium text-purple-800 leading-tight">
             {t("home.categories.title")}
           </h2>
-          <p className="mt-2.5  text-sm sm:text-base max-w-xs sm:max-w-md md:max-w-lg mx-auto leading-relaxed">
+          <p className="mt-2.5 text-sm sm:text-base max-w-xs sm:max-w-md md:max-w-lg mx-auto leading-relaxed">
             {isRtl
               ? "استكشف مجموعتنا المتنوعة من الهدايا حسب الفئة."
               : "Explore our diverse collection of gifts by category."}
@@ -141,11 +146,11 @@ const CategoriesSection: React.FC = () => {
           </button>
           <div
             ref={scrollRef}
-            className="flex overflow-x-auto gap-x-3 pb-4 snap-x snap-mandatory scroll-smooth 
-                         px-[calc(50%-4.5rem)] sm:px-[calc(50%-4.5rem)] md:px-4 
+            className="flex overflow-x-auto gap-x-4 pb-4 snap-x snap-mandatory scroll-smooth 
+                         px-[calc(50%-5rem)] sm:px-[calc(50%-5rem)] md:px-4 
                          md:gap-x-2"
             style={{
-              perspective: "1000px",
+              perspective: "1200px",
               WebkitOverflowScrolling: "touch",
               scrollbarWidth: isMobile ? "none" : "thin",
               scrollbarColor: isMobile ? "transparent" : "#8A2BE2 transparent",
@@ -154,27 +159,27 @@ const CategoriesSection: React.FC = () => {
             {categories.map((category: Category, index) => (
               <div
                 key={category.id}
-                className="flex-shrink-0 w-36 sm:w-36 md:w-48 snap-center touch-manipulation"
+                className="flex-shrink-0 w-40 sm:w-40 md:w-48 snap-center touch-manipulation"
               >
                 <Link to={`/category/${category.id}`}>
-                  <div className="bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-[box-shadow,border-color] duration-300 overflow-hidden group">
+                  <div className="bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-[box-shadow,border-color] duration-300 overflow-hidden group">
                     <div className="relative aspect-square overflow-hidden rounded-t-xl">
                       <ProductImage
                         src={category.imageUrl}
                         alt={t(category.nameKey)}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        width={144}
-                        height={144}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-2"
+                        width={160}
+                        height={160}
                         aspectRatio="square"
-                        sizes="(max-width: 767px) 144px, 192px"
+                        sizes="(max-width: 767px) 160px, 192px"
                         quality={100}
                         priority={index < 3}
                         showZoom={false}
                         placeholderSize={28}
                         fallbackSrc="https://images.pexels.com/photos/1058775/pexels-photo-1058775.jpeg?auto=compress&cs=tinysrgb&w=400"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end justify-center p-4">
-                        <h3 className="text-base font-semibold text-white text-center">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end justify-center p-4 transition-opacity duration-300 group-hover:opacity-90">
+                        <h3 className="text-base font-semibold text-white text-center transform transition-transform duration-300 group-hover:-translate-y-1">
                           {t(category.nameKey)}
                         </h3>
                       </div>

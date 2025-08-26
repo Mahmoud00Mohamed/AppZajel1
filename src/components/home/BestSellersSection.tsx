@@ -147,11 +147,11 @@ const BestSellersSection: React.FC = () => {
             {bestSellers.map((product, index) => (
               <div
                 key={product.id}
-                className="flex-shrink-0 w-40 sm:w-40 md:w-48 snap-center touch-manipulation"
+                className="flex-shrink-0 w-44 sm:w-44 md:w-52 snap-center touch-manipulation"
               >
                 <Link to={`/product/${product.id}`}>
-                  <div className="bg-white rounded-xl border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 overflow-hidden group h-[220px] md:h-[260px] flex flex-col">
-                    <div className="relative aspect-square overflow-hidden rounded-t-xl">
+                  <div className="bg-white rounded-3xl border border-gray-100 shadow-md transition-all duration-300 overflow-hidden group w-44 h-44 sm:w-44 sm:h-44 md:w-52 md:h-52 flex flex-col">
+                    <div className="relative aspect-square overflow-hidden rounded-t-3xl bg-gradient-to-br from-purple-50 to-gray-50">
                       <ProductImage
                         src={product.imageUrl}
                         alt={
@@ -160,10 +160,10 @@ const BestSellersSection: React.FC = () => {
                             : product.nameEn
                         }
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        width={160}
-                        height={160}
+                        width={176}
+                        height={176}
                         aspectRatio="square"
-                        sizes="(max-width: 767px) 160px, 192px"
+                        sizes="(max-width: 767px) 176px, 208px"
                         quality={100}
                         priority={index < 3}
                         showZoom={false}
@@ -171,19 +171,19 @@ const BestSellersSection: React.FC = () => {
                         fallbackSrc="https://images.pexels.com/photos/1058775/pexels-photo-1058775.jpeg?auto=compress&cs=tinysrgb&w=400"
                       />
                       <div className="absolute top-2 left-2 rtl:right-2 rtl:left-auto z-10">
-                        <div className="bg-gradient-to-r from-purple-600 to-purple-800 text-white text-xs font-bold py-1 px-2 rounded-full flex items-center gap-1 shadow-sm">
+                        <div className="bg-blue-600 text-white text-xs font-semibold py-1 px-2 rounded-full flex items-center gap-1 shadow-sm">
                           <Crown size={12} />
                           {t("home.bestSellers.bestSeller")}
                         </div>
                       </div>
                     </div>
-                    <div className="p-3 flex flex-col">
-                      <h3 className="text-sm font-semibold text-gray-800 line-clamp-1 overflow-hidden text-ellipsis whitespace-nowrap mb-1">
+                    <div className="p-3 flex flex-col flex-grow justify-between">
+                      <h3 className="text-sm font-medium text-gray-900 line-clamp-1 overflow-hidden text-ellipsis whitespace-nowrap">
                         {i18n.language === "ar"
                           ? product.nameAr
                           : product.nameEn}
                       </h3>
-                      <p className="text-base font-bold text-purple-700">
+                      <p className="text-base font-semibold text-purple-900">
                         {product.price} {i18n.language === "ar" ? "ر.س" : "SAR"}
                       </p>
                     </div>

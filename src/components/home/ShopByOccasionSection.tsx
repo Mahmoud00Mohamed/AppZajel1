@@ -33,7 +33,7 @@ const OccasionCard: React.FC<{ occasion: Occasion; isFixed?: boolean }> = ({
         <ProductImage
           src={occasion.imageUrl}
           alt={t(occasion.nameKey)}
-          className="w-full  h-full  rounded-[20px]"
+          className="w-full  h-full object-cover rounded-[20px]"
           width={120}
           height={120}
           aspectRatio="square"
@@ -109,7 +109,7 @@ const ShopByOccasionSection: React.FC = () => {
   if (!firstOccasion) return null;
 
   return (
-    <section className="py-14 sm:py-18 bg-white">
+    <section className="py-10 sm:py-18 bg-white">
       <div className="container-custom px-4 sm:px-6">
         <div className="text-center mb-10">
           <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-medium text-purple-800 leading-tight">
