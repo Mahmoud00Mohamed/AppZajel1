@@ -489,7 +489,7 @@ const HeroSlider: React.FC = () => {
                 currentSlide === 0 ? allSlides.length - 1 : currentSlide - 1
               )
             }
-            className={`absolute top-1/2 transform -translate-y-1/2 ${
+            className={`hidden sm:flex absolute top-1/2 transform -translate-y-1/2 ${
               isArabic ? "right-3 sm:right-6" : "left-3 sm:left-6"
             } z-30 w-8 h-8 sm:w-12 sm:h-12 bg-white/10 backdrop-blur-md text-white rounded-full flex items-center justify-center transition-all duration-300 border border-white/20`}
             aria-label={isArabic ? "الشريحة السابقة" : "Previous slide"}
@@ -503,7 +503,7 @@ const HeroSlider: React.FC = () => {
             onClick={() =>
               setCurrentSlide((currentSlide + 1) % allSlides.length)
             }
-            className={`absolute top-1/2 transform -translate-y-1/2 ${
+            className={`hidden sm:flex absolute top-1/2 transform -translate-y-1/2 ${
               isArabic ? "left-3 sm:left-6" : "right-3 sm:right-6"
             } z-30 w-8 h-8 sm:w-12 sm:h-12 bg-white/10 backdrop-blur-md text-white rounded-full flex items-center justify-center transition-all duration-300 border border-white/20`}
             aria-label={isArabic ? "الشريحة التالية" : "Next slide"}
