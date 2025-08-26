@@ -8,7 +8,6 @@ import {
   Menu,
   X,
   ChevronDown,
-  MapPin,
   Bell,
   Heart,
   Package,
@@ -43,33 +42,32 @@ const Header = () => {
     <header className="w-full bg-white shadow-sm sticky top-0 z-50">
       {/* Top announcement bar */}
       <div className="bg-gradient-to-r from-purple-600 to-pink-500 text-white py-1.5">
-        <div className="container-custom flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div
+          className={`container-custom flex items-center ${
+            isRtl ? "justify-end flex-row-reverse" : "justify-start flex-row"
+          } gap-6`}
+        >
+          <div className="flex items-center gap-6">
+            {/* Fast Delivery */}
             <div className="flex items-center gap-1.5">
-              <Truck size={14} className="text-yellow-300 animate-pulse" />
+              <Truck size={14} className="text-white" />
               <span className="text-xs sm:text-sm font-semibold tracking-wide">
-                توصيل سريع
+                {i18n.language === "ar" ? "توصيل سريع" : "Fast Delivery"}
               </span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <Gift size={14} className="text-yellow-300" />
-              <span className="text-xs sm:text-sm font-semibold tracking-wide">
-                ورود وهدايا فاخرة
-              </span>
-            </div>
-          </div>
 
-          <div className="flex items-center bg-white/20 rounded-lg px-2 py-1">
-            <MapPin size={14} className="mr-1 rtl:ml-1" />
-            <select className="text-xs font-bold bg-transparent border-none focus:outline-none text-white">
-              <option className="text-gray-800">Riyadh</option>
-              <option className="text-gray-800">Jeddah</option>
-              <option className="text-gray-800">Dammam</option>
-            </select>
+            {/* Luxury Gifts */}
+            <div className="flex items-center gap-1.5">
+              <Gift size={14} className="text-white" />
+              <span className="text-xs sm:text-sm font-semibold tracking-wide">
+                {i18n.language === "ar"
+                  ? "ورود وهدايا فاخرة"
+                  : "Luxury Flowers & Gifts"}
+              </span>
+            </div>
           </div>
         </div>
       </div>
-
       {/* Main header */}
       <div className="container-custom py-3">
         <div className="flex items-center justify-between">
