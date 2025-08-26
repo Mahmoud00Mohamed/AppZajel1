@@ -64,20 +64,26 @@ const CategoriesSection: React.FC = () => {
   useEffect(() => {
     const scrollContainer = scrollRef.current;
     if (scrollContainer && window.innerWidth < 768) {
-      const cardWidth = 160 + 16;
-      const middleIndex = Math.floor(categories.length / 2);
-      let scrollPosition =
-        middleIndex * cardWidth -
-        scrollContainer.offsetWidth / 2 +
-        cardWidth / 2;
+      const cardWidth = 160 + 16; // عرض الكارت + المسافة
+      const containerWidth = scrollContainer.offsetWidth;
+      const totalCards = categories.length;
 
-      // تأكد أن scrollPosition لا يتجاوز الحد الأقصى
-      const maxScrollLeft =
-        scrollContainer.scrollWidth - scrollContainer.offsetWidth;
-      if (scrollPosition > maxScrollLeft) scrollPosition = maxScrollLeft;
-      if (scrollPosition < 0) scrollPosition = 0;
+      // حساب أقصى موضع تمرير ممكن
+      const totalScrollWidth = totalCards * cardWidth;
+      const maxScrollLeft = totalScrollWidth - containerWidth;
 
-      scrollContainer.scrollLeft = isRtl ? -scrollPosition : scrollPosition;
+      // حساب الموضع المطلوب للكارت الأوسط
+      const middleIndex = Math.floor(totalCards / 2);
+      let targetScrollPosition =
+        middleIndex * cardWidth - containerWidth / 2 + cardWidth / 2;
+
+      // التأكد من أن الموضع لا يتجاوز الحد الأقصى
+      targetScrollPosition = Math.min(targetScrollPosition, maxScrollLeft);
+      targetScrollPosition = Math.max(targetScrollPosition, 0);
+
+      scrollContainer.scrollLeft = isRtl
+        ? -targetScrollPosition
+        : targetScrollPosition;
     }
   }, [isRtl]);
 
