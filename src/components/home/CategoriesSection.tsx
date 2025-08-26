@@ -63,28 +63,25 @@ const CategoriesSection: React.FC = () => {
 
   useEffect(() => {
     const scrollContainer = scrollRef.current;
-    if (scrollContainer && window.innerWidth < 768) {
-      const cardWidth = 160 + 16; // عرض الكارت + المسافة
-      const containerWidth = scrollContainer.offsetWidth;
-      const totalCards = categories.length;
+    if (!scrollContainer || window.innerWidth >= 768) return;
 
-      // حساب أقصى موضع تمرير ممكن
-      const totalScrollWidth = totalCards * cardWidth;
-      const maxScrollLeft = totalScrollWidth - containerWidth;
+    const cardWidth = 160 + 16; // عرض الكارت + المسافة
+    const totalCards = categories.length;
 
-      // حساب الموضع المطلوب للكارت الأوسط
-      const middleIndex = Math.floor(totalCards / 2);
-      let targetScrollPosition =
-        middleIndex * cardWidth - containerWidth / 2 + cardWidth / 2;
+    // نحاول مركزية آخر كارت
+    const lastCardIndex = totalCards - 1;
+    let scrollPosition =
+      lastCardIndex * cardWidth -
+      scrollContainer.offsetWidth / 2 +
+      cardWidth / 2;
 
-      // التأكد من أن الموضع لا يتجاوز الحد الأقصى
-      targetScrollPosition = Math.min(targetScrollPosition, maxScrollLeft);
-      targetScrollPosition = Math.max(targetScrollPosition, 0);
+    // الحد الأقصى للتمرير
+    const maxScrollLeft =
+      scrollContainer.scrollWidth - scrollContainer.offsetWidth;
+    if (scrollPosition > maxScrollLeft) scrollPosition = maxScrollLeft;
+    if (scrollPosition < 0) scrollPosition = 0;
 
-      scrollContainer.scrollLeft = isRtl
-        ? -targetScrollPosition
-        : targetScrollPosition;
-    }
+    scrollContainer.scrollLeft = isRtl ? -scrollPosition : scrollPosition;
   }, [isRtl]);
 
   useEffect(() => {
