@@ -54,13 +54,16 @@ const BestSellersSection: React.FC = () => {
   useEffect(() => {
     const scrollContainer = scrollRef.current;
     if (scrollContainer && window.innerWidth < 768) {
-      const cardWidth = 160 + 12;
       const middleIndex = Math.floor(bestSellers.length / 2);
-      const scrollPosition =
-        middleIndex * cardWidth -
-        scrollContainer.offsetWidth / 2 +
-        cardWidth / 2;
-      scrollContainer.scrollLeft = isRtl ? -scrollPosition : scrollPosition;
+      const middleCard = scrollContainer.children[middleIndex] as HTMLElement;
+
+      if (middleCard) {
+        middleCard.scrollIntoView({
+          behavior: "instant", // أو "auto" لو عايز بدون أنيميشن
+          inline: "center",
+          block: "nearest",
+        });
+      }
     }
   }, [isRtl, bestSellers.length]);
 
@@ -136,7 +139,10 @@ const BestSellersSection: React.FC = () => {
           </button>
           <div
             ref={scrollRef}
-            className="flex overflow-x-auto gap-x-3 pb-4 snap-x snap-mandatory scroll-smooth px-[calc(50%-80px)] sm:px-[calc(50%-80px)] md:px-4 md:gap-x-2"
+            className="flex overflow-x-auto gap-x-3 pb-4 snap-x snap-mandatory scroll-smooth 
+             pl-[calc(50%-80px)] pr-[calc(50%-80px)] 
+             sm:pl-[calc(50%-80px)] sm:pr-[calc(50%-80px)] 
+             md:px-4 md:gap-x-2"
             style={{
               perspective: "1000px",
               WebkitOverflowScrolling: "touch",
@@ -147,10 +153,10 @@ const BestSellersSection: React.FC = () => {
             {bestSellers.map((product, index) => (
               <div
                 key={product.id}
-                className="flex-shrink-0 w-44 sm:w-44 md:w-52 snap-center touch-manipulation"
+                className="flex-shrink-0 w-56 sm:w-56 md:w-60 snap-center touch-manipulation"
               >
                 <Link to={`/product/${product.id}`}>
-                  <div className="bg-white rounded-3xl border border-gray-100 shadow-md transition-all duration-300 overflow-hidden group w-44 h-44 sm:w-44 sm:h-44 md:w-52 md:h-52 flex flex-col">
+                  <div className="bg-white rounded-3xl border border-gray-100 shadow-md transition-all duration-300 overflow-hidden group w-56 h-56 sm:w-56 sm:h-56 md:w-60 md:h-60 flex flex-col">
                     <div className="relative aspect-square overflow-hidden rounded-t-3xl bg-gradient-to-br from-purple-50 to-gray-50">
                       <ProductImage
                         src={product.imageUrl}
@@ -160,16 +166,17 @@ const BestSellersSection: React.FC = () => {
                             : product.nameEn
                         }
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        width={176}
-                        height={176}
+                        width={224}
+                        height={224}
                         aspectRatio="square"
-                        sizes="(max-width: 767px) 176px, 208px"
+                        sizes="(max-width: 767px) 224px, 240px"
                         quality={100}
                         priority={index < 3}
                         showZoom={false}
                         placeholderSize={28}
                         fallbackSrc="https://images.pexels.com/photos/1058775/pexels-photo-1058775.jpeg?auto=compress&cs=tinysrgb&w=400"
                       />
+
                       <div className="absolute top-2 left-2 rtl:right-2 rtl:left-auto z-10">
                         <div className="bg-blue-600 text-white text-xs font-semibold py-1 px-2 rounded-full flex items-center gap-1 shadow-sm">
                           <Crown size={12} />
