@@ -66,10 +66,17 @@ const CategoriesSection: React.FC = () => {
     if (scrollContainer && window.innerWidth < 768) {
       const cardWidth = 160 + 16;
       const middleIndex = Math.floor(categories.length / 2);
-      const scrollPosition =
+      let scrollPosition =
         middleIndex * cardWidth -
         scrollContainer.offsetWidth / 2 +
         cardWidth / 2;
+
+      // تأكد أن scrollPosition لا يتجاوز الحد الأقصى
+      const maxScrollLeft =
+        scrollContainer.scrollWidth - scrollContainer.offsetWidth;
+      if (scrollPosition > maxScrollLeft) scrollPosition = maxScrollLeft;
+      if (scrollPosition < 0) scrollPosition = 0;
+
       scrollContainer.scrollLeft = isRtl ? -scrollPosition : scrollPosition;
     }
   }, [isRtl]);
