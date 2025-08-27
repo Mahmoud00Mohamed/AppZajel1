@@ -91,7 +91,7 @@ function App() {
                 style={{ scrollBehavior: "smooth" }}
               >
                 <Header />
-                <main className="flex-grow pb-16 md:pb-0">
+                <main className="flex-grow pb-0 md:pb-0">
                   <Suspense
                     fallback={
                       <div className="flex justify-center items-center min-h-screen">
