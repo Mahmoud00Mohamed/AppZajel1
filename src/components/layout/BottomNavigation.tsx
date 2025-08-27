@@ -4,57 +4,57 @@ import { Link, useLocation } from "react-router-dom";
 import { useFavorites } from "../../context/FavoritesContext";
 import { motion } from "framer-motion";
 
-// الخطوة 1: استيراد الأيقونات الجديدة من مكتبة react-icons (Material Design Icons)
+// الخطوة 1: استيراد أيقونات Heroicons الحديثة والبسيطة
 import {
-  MdOutlineHome,
-  MdHome,
-  MdOutlineGridView,
-  MdGridView,
-  MdOutlineNotifications,
-  MdNotifications,
-  MdOutlineFavoriteBorder,
-  MdFavorite,
-  MdOutlineInventory2,
-  MdInventory2,
-} from "react-icons/md";
+  HiOutlineHome,
+  HiHome,
+  HiOutlineSquares2X2,
+  HiSquares2X2,
+  HiOutlineBell,
+  HiBell,
+  HiOutlineHeart,
+  HiHeart,
+  HiOutlineArchiveBox,
+  HiArchiveBox,
+} from "react-icons/hi2";
 
 const BottomNavigation: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { favoritesCount } = useFavorites();
 
-  // الخطوة 2: تحديث بنية مصفوفة الأيقونات لتشمل نسختين لكل أيقونة
+  // الخطوة 2: تحديث مصفوفة الأيقونات لاستخدام أيقونات Heroicons
   const navItems = React.useMemo(
     () => [
       {
         id: "home",
         path: "/",
-        icon: { outline: MdOutlineHome, filled: MdHome },
+        icon: { outline: HiOutlineHome, filled: HiHome },
         labelKey: "bottomNav.home",
       },
       {
         id: "categories",
         path: "/categories",
-        icon: { outline: MdOutlineGridView, filled: MdGridView },
+        icon: { outline: HiOutlineSquares2X2, filled: HiSquares2X2 },
         labelKey: "bottomNav.categories",
       },
       {
         id: "notifications",
         path: "/notifications",
-        icon: { outline: MdOutlineNotifications, filled: MdNotifications },
+        icon: { outline: HiOutlineBell, filled: HiBell },
         labelKey: "bottomNav.notifications",
       },
       {
         id: "favorites",
         path: "/favorites",
-        icon: { outline: MdOutlineFavoriteBorder, filled: MdFavorite },
+        icon: { outline: HiOutlineHeart, filled: HiHeart },
         labelKey: "bottomNav.favorites",
         badge: favoritesCount,
       },
       {
         id: "packages",
         path: "/packages",
-        icon: { outline: MdOutlineInventory2, filled: MdInventory2 },
+        icon: { outline: HiOutlineArchiveBox, filled: HiArchiveBox },
         labelKey: "bottomNav.packages",
       },
     ],
@@ -74,7 +74,6 @@ const BottomNavigation: React.FC = () => {
       <div className="flex h-[65px] justify-around">
         {navItems.map((item) => {
           const active = isActive(item.path);
-          // الخطوة 3: اختيار الأيقونة المناسبة (ممتلئة أو مخططة) بناءً على الحالة
           const Icon = active ? item.icon.filled : item.icon.outline;
 
           return (
@@ -92,9 +91,9 @@ const BottomNavigation: React.FC = () => {
               )}
 
               <motion.div className="relative" whileTap={{ scale: 0.9 }}>
-                {/* تم تعديل حجم الأيقونة ليتناسب مع التصميم الجديد */}
                 <Icon
-                  size={26}
+                  // تم تعديل الحجم ليتناسب مع تصميم Heroicons
+                  size={25}
                   className={`transition-colors ${
                     active ? "text-purple-800" : "text-gray-500"
                   }`}
