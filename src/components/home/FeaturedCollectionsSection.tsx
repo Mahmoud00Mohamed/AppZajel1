@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback, useState } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ChevronRight, ChevronLeft, Gift } from "lucide-react";
@@ -11,98 +11,34 @@ const FeaturedCollectionsSection: React.FC = () => {
   const isRtl = i18n.language === "ar";
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const featuredProducts = React.useMemo(() => getSpecialGifts(), []);
+  const featuredProducts = useMemo(() => getSpecialGifts(), []);
 
-  const featuredImages = React.useMemo(
+  const featuredImages = useMemo(
     () => featuredProducts.slice(0, 8).map((product) => product.imageUrl),
     [featuredProducts]
   );
   useImagePreloader(featuredImages, { priority: true });
 
-  const handle3dScrollEffect = useCallback(() => {
-    const scrollContainer = scrollRef.current;
-    if (!scrollContainer) return;
-
-    if (window.innerWidth >= 768) {
-      (Array.from(scrollContainer.children) as HTMLElement[]).forEach(
-        (card) => {
-          card.style.transform = "";
-        }
-      );
-      return;
-    }
-
-    const containerViewportCenter =
-      scrollContainer.getBoundingClientRect().left +
-      scrollContainer.offsetWidth / 2;
-
-    (Array.from(scrollContainer.children) as HTMLElement[]).forEach((card) => {
-      const cardRect = card.getBoundingClientRect();
-      const cardCenter = cardRect.left + cardRect.width / 2;
-      const distance = cardCenter - containerViewportCenter;
-
-      const maxDistance = scrollContainer.offsetWidth / 2;
-      const ratio = Math.min(Math.max(distance / maxDistance, -1), 1);
-
-      const scale = 1 - Math.abs(ratio) * 0.35;
-      const rotateY = ratio * -35;
-
-      card.style.transform = `scale(${scale}) rotateY(${rotateY}deg)`;
-    });
-  }, []);
-
   useEffect(() => {
-    const scrollContainer = scrollRef.current;
-    if (scrollContainer && window.innerWidth < 768) {
-      const middleIndex = Math.floor(featuredProducts.length / 2);
-      const middleCard = scrollContainer.children[middleIndex] as HTMLElement;
-
-      if (middleCard) {
-        middleCard.scrollIntoView({
-          behavior: "instant", // أو "auto" عشان يبقى من غير أنيميشن
-          inline: "center",
-          block: "nearest",
-        });
-      }
-    }
-  }, [isRtl, featuredProducts.length]);
-
-  useEffect(() => {
-    const scrollContainer = scrollRef.current;
-    if (scrollContainer) {
-      handle3dScrollEffect();
-      scrollContainer.addEventListener("scroll", handle3dScrollEffect, {
-        passive: true,
-      });
-      window.addEventListener("resize", handle3dScrollEffect);
-    }
-
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", handleResize);
-
-    return () => {
-      if (scrollContainer) {
-        scrollContainer.removeEventListener("scroll", handle3dScrollEffect);
-      }
-      window.removeEventListener("resize", handle3dScrollEffect);
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [handle3dScrollEffect]);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const scroll = (direction: "left" | "right") => {
-    if (scrollRef.current) {
-      const cardWidth = window.innerWidth >= 768 ? 192 + 8 : 160 + 12;
-      scrollRef.current.scrollBy({
-        left: isRtl
-          ? direction === "left"
-            ? cardWidth
-            : -cardWidth
-          : direction === "left"
-          ? -cardWidth
-          : cardWidth,
-        behavior: "smooth",
-      });
-    }
+    if (!scrollRef.current) return;
+    // تم توحيد عرض البطاقة مع قسم BestSellers
+    const cardWidth = isMobile ? 160 + 12 : 192 + 8;
+    scrollRef.current.scrollBy({
+      left: isRtl
+        ? direction === "left"
+          ? cardWidth
+          : -cardWidth
+        : direction === "left"
+        ? -cardWidth
+        : cardWidth,
+      behavior: "smooth",
+    });
   };
 
   const prevDirection = isRtl ? "right" : "left";
@@ -123,28 +59,29 @@ const FeaturedCollectionsSection: React.FC = () => {
         </div>
 
         <div className="relative">
-          <button
-            onClick={() => scroll(prevDirection)}
-            className="hidden md:flex items-center justify-center absolute top-[40%] -translate-y-1/2 bg-white/90 text-stone-600 rounded-full w-9 h-9 shadow ring-1 ring-stone-200 z-10 -left-8"
-            aria-label={t("common.scrollLeft")}
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <button
-            onClick={() => scroll(nextDirection)}
-            className="hidden md:flex items-center justify-center absolute top-[40%] -translate-y-1/2 bg-white/90 text-stone-600 rounded-full w-9 h-9 shadow ring-1 ring-stone-200 z-10 -right-8"
-            aria-label={t("common.scrollRight")}
-          >
-            <ChevronRight size={18} />
-          </button>
+          {!isMobile && (
+            <>
+              <button
+                onClick={() => scroll(prevDirection)}
+                className="hidden md:flex items-center justify-center absolute top-[40%] -translate-y-1/2 bg-white/90 text-stone-600 rounded-full w-9 h-9 shadow ring-1 ring-stone-200 z-10 -left-8"
+                aria-label={t("common.scrollLeft")}
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                onClick={() => scroll(nextDirection)}
+                className="hidden md:flex items-center justify-center absolute top-[40%] -translate-y-1/2 bg-white/90 text-stone-600 rounded-full w-9 h-9 shadow ring-1 ring-stone-200 z-10 -right-8"
+                aria-label={t("common.scrollRight")}
+              >
+                <ChevronRight size={18} />
+              </button>
+            </>
+          )}
+          {/* تم تبسيط هذا الجزء ليطابق BestSellersSection */}
           <div
             ref={scrollRef}
-            className="flex overflow-x-auto gap-x-3 pb-4 snap-x snap-mandatory scroll-smooth 
-             pl-[calc(50%-80px)] pr-[calc(50%-80px)] 
-             sm:pl-[calc(50%-80px)] sm:pr-[calc(50%-80px)] 
-             md:px-4 md:gap-x-2"
+            className="flex overflow-x-auto gap-x-3 pb-4 snap-x snap-mandatory scroll-smooth touch-pan-x"
             style={{
-              perspective: "1000px",
               WebkitOverflowScrolling: "touch",
               scrollbarWidth: isMobile ? "none" : "thin",
               scrollbarColor: isMobile ? "transparent" : "#8A2BE2 transparent",
@@ -166,10 +103,10 @@ const FeaturedCollectionsSection: React.FC = () => {
                             : product.nameEn
                         }
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        width={176}
-                        height={176}
+                        width={224} // تم توحيد الحجم
+                        height={224} // تم توحيد الحجم
                         aspectRatio="square"
-                        sizes="(max-width: 767px) 176px, 208px"
+                        sizes="(max-width: 767px) 224px, 240px" // تم توحيد الأحجام
                         quality={100}
                         priority={index < 3}
                         showZoom={false}
