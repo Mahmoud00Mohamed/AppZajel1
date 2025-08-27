@@ -8,6 +8,7 @@ declare global {
         siteKey: string,
         options: { action: string }
       ) => Promise<string>;
+      reset: () => void;
     };
   }
 }
@@ -33,6 +34,7 @@ export const useRecaptcha = ({ siteKey, action }: UseRecaptchaOptions) => {
     script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
     script.async = true;
     script.defer = true;
+    script.id = "recaptcha-script"; // إضافة ID للسكريبت
 
     script.onload = () => {
       window.grecaptcha.ready(() => {
@@ -47,10 +49,66 @@ export const useRecaptcha = ({ siteKey, action }: UseRecaptchaOptions) => {
     document.head.appendChild(script);
 
     return () => {
-      // Cleanup script if component unmounts
-      const existingScript = document.querySelector(`script[src*="recaptcha"]`);
-      if (existingScript) {
-        document.head.removeChild(existingScript);
+      // تنظيف شامل عند إلغاء تحميل المكون
+      try {
+        // إزالة السكريبت
+        const existingScript = document.getElementById("recaptcha-script");
+        if (existingScript) {
+          document.head.removeChild(existingScript);
+        }
+
+        // إزالة جميع عناصر reCAPTCHA من الـ DOM
+        const recaptchaElements = document.querySelectorAll(
+          '[id^="___grecaptcha"]'
+        );
+        recaptchaElements.forEach((element) => {
+          element.remove();
+        });
+
+        // إزالة عناصر reCAPTCHA الإضافية
+        const recaptchaBadge = document.querySelector(".grecaptcha-badge");
+        if (recaptchaBadge) {
+          recaptchaBadge.remove();
+        }
+
+        // إزالة أي iframes خاصة بـ reCAPTCHA
+        const recaptchaIframes = document.querySelectorAll(
+          'iframe[src*="recaptcha"]'
+        );
+        recaptchaIframes.forEach((iframe) => {
+          iframe.remove();
+        });
+
+        // إزالة أي divs خاصة بـ reCAPTCHA
+        const recaptchaDivs = document.querySelectorAll(
+          'div[style*="recaptcha"]'
+        );
+        recaptchaDivs.forEach((div) => {
+          div.remove();
+        });
+
+        // إعادة تعيين متغير grecaptcha
+        if (window.grecaptcha) {
+          try {
+            window.grecaptcha.reset();
+          } catch {
+            // تجاهل الأخطاء في reset
+          }
+          // @ts-expect-error - إزالة المتغير من window
+          delete window.grecaptcha;
+        }
+
+        // إزالة أي CSS خاص بـ reCAPTCHA
+        const recaptchaStyles = document.querySelectorAll(
+          'style[data-styled*="recaptcha"], link[href*="recaptcha"]'
+        );
+        recaptchaStyles.forEach((style) => {
+          style.remove();
+        });
+
+        setIsLoaded(false);
+      } catch (error) {
+        console.warn("Error during reCAPTCHA cleanup:", error);
       }
     };
   }, [siteKey]);
