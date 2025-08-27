@@ -1,3 +1,5 @@
+// ToastContext.tsx
+
 import { createContext, useContext, useState, ReactNode } from "react";
 import { AnimatePresence } from "framer-motion";
 import Toast, { ToastProps } from "../components/ui/Toast";
@@ -7,7 +9,9 @@ interface ToastContextType {
   showSuccess: (
     title: string,
     message?: string,
-    action?: ToastProps["action"]
+    action?: ToastProps["action"],
+    // 1. Add optional 'type' parameter to customize the success toast
+    type?: "success" | "cart-success" | "favorite-success"
   ) => void;
   showError: (title: string, message?: string) => void;
   showWarning: (title: string, message?: string) => void;
@@ -37,9 +41,11 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
   const showSuccess = (
     title: string,
     message?: string,
-    action?: ToastProps["action"]
+    action?: ToastProps["action"],
+    // 2. Use the provided type, or default to "success"
+    type: "success" | "cart-success" | "favorite-success" = "success"
   ) => {
-    showToast({ type: "success", title, message, action });
+    showToast({ type, title, message, action });
   };
 
   const showError = (title: string, message?: string) => {

@@ -50,15 +50,15 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
         );
       } else {
         addToFavorites(product);
+
+        // تم حذف كائن الـ action من هنا
         showSuccess(
           isRtl ? "تم الإضافة للمفضلة" : "Added to Favorites",
           isRtl
             ? `تم إضافة ${product.nameAr} إلى المفضلة`
             : `${product.nameEn} added to favorites`,
-          {
-            label: isRtl ? "عرض المفضلة" : "View Favorites",
-            onClick: () => (window.location.href = "/favorites"),
-          }
+          undefined, // <- تم حذف الزر
+          "favorite-success"
         );
       }
     } catch (error) {

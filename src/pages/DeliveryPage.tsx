@@ -1,175 +1,219 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
-import { MapPin, Truck, Clock } from "lucide-react";
-import { ProductImage } from "../features/images";
+import { Link } from "react-router-dom";
+import {
+  MapPin,
+  Truck,
+  Clock,
+  Package,
+  PackageCheck,
+  ShoppingBag,
+  ArrowRight,
+  ArrowLeft,
+} from "lucide-react";
+import { motion, Variants } from "framer-motion";
+
+// Animation Variants
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.1 },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 80, damping: 12 },
+  },
+};
+
+const StepCard: React.FC<{
+  icon: React.ReactNode;
+  step: string;
+  title: string;
+  description: string;
+}> = ({ icon, step, title, description }) => {
+  return (
+    <motion.div
+      variants={itemVariants}
+      className="relative flex flex-col items-center text-center p-6 bg-white rounded-2xl shadow-lg border border-neutral-100"
+    >
+      <div className="absolute -top-6 bg-gradient-to-r from-purple-600 to-pink-500 text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl shadow-md">
+        {step}
+      </div>
+      <div className="mt-8 mb-4 text-purple-600">{icon}</div>
+      <h3 className="text-xl font-bold text-neutral-800 mb-2">{title}</h3>
+      <p className="text-neutral-600 leading-relaxed flex-grow">
+        {description}
+      </p>
+    </motion.div>
+  );
+};
 
 const DeliveryPage: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const isRtl = i18n.language === "ar";
-  const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    document.title = isRtl
-      ? "زاجل السعادة | معلومات التوصيل"
-      : "Zajil Al-Sa'adah | Delivery Information";
-
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [isRtl]);
+  const deliverySteps = [
+    {
+      icon: <ShoppingBag size={40} />,
+      title: isRtl ? "تأكيد الطلب" : "Order Confirmation",
+      description: isRtl
+        ? "بمجرد إتمام طلبك، يصلك تأكيد فوري عبر البريد الإلكتروني."
+        : "Once your order is placed, you receive an instant confirmation via email.",
+    },
+    {
+      icon: <Package size={40} />,
+      title: isRtl ? "تجهيز الهدية" : "Gift Preparation",
+      description: isRtl
+        ? "يقوم فريقنا بتجهيز وتغليف هديتك بعناية فائقة واهتمام بالتفاصيل."
+        : "Our team carefully prepares and wraps your gift with great attention to detail.",
+    },
+    {
+      icon: <Truck size={40} />,
+      title: isRtl ? "الشحن والتوصيل" : "Shipping & Dispatch",
+      description: isRtl
+        ? "يتم تسليم طلبك إلى شريك الشحن الموثوق لدينا لبدء رحلته إليك."
+        : "Your order is handed over to our trusted shipping partner to begin its journey.",
+    },
+    {
+      icon: <PackageCheck size={40} />,
+      title: isRtl ? "تم التوصيل" : "Delivery Complete",
+      description: isRtl
+        ? "تصل هديتك إلى العنوان المحدد، جاهزة لرسم الابتسامة على الوجوه."
+        : "Your gift arrives at the specified address, ready to bring a smile to someone's face.",
+    },
+  ];
 
   return (
-    <section className="py-12 bg-gray-50">
-      <div className="container-custom">
-        <h1 className="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">
-          {t("footer.delivery")}
-        </h1>
-
-        {/* Hero Image */}
-        <div className="mb-12">
-          <ProductImage
-            src="https://images.pexels.com/photos/4391470/pexels-photo-4391470.jpeg?auto=compress&cs=tinysrgb&w=1200"
-            alt={isRtl ? "خدمة التوصيل" : "Delivery Service"}
-            className="w-full h-64 md:h-80 object-cover rounded-2xl shadow-lg"
-            width={1200}
-            height={isMobile ? 256 : 320}
-            aspectRatio="landscape"
-            sizes="100vw"
-            quality={100}
-            priority={true}
-            showZoom={false}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Delivery Locations */}
-          <div className="card p-6">
-            <div className="flex items-center justify-center mb-4">
-              <MapPin
-                size={32}
-                className="text-primary mr-2 rtl:ml-2 rtl:mr-0"
-              />
-              <h2 className="text-xl font-bold text-gray-800">
-                {isRtl ? "مناطق التوصيل" : "Delivery Locations"}
-              </h2>
-            </div>
-            <div className="mb-6">
-              <ProductImage
-                src="https://images.pexels.com/photos/346885/pexels-photo-346885.jpeg?auto=compress&cs=tinysrgb&w=400"
-                alt={isRtl ? "مناطق التوصيل" : "Delivery Areas"}
-                className="w-full h-32 object-cover rounded-lg"
-                width={400}
-                height={128}
-                aspectRatio="landscape"
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                quality={100}
-                priority={false}
-                showZoom={false}
-              />
-            </div>
-            <p className="text-gray-600 text-center">
-              {isRtl
-                ? "نقدم خدمات التوصيل في الرياض، جدة، والدمام، مع خطط للتوسع إلى مدن أخرى قريباً."
-                : "We offer delivery services in Riyadh, Jeddah, and Dammam, with plans to expand to other cities soon."}
-            </p>
-
-            <ul className="mt-4 space-y-2 text-gray-600">
-              <li className="flex items-center justify-center">
-                <span className="w-2 h-2 bg-primary rounded-full mr-2 rtl:ml-2 rtl:mr-0"></span>
-                {isRtl ? "الرياض" : "Riyadh"}
-              </li>
-              <li className="flex items-center justify-center">
-                <span className="w-2 h-2 bg-primary rounded-full mr-2 rtl:ml-2 rtl:mr-0"></span>
-                {isRtl ? "جدة" : "Jeddah"}
-              </li>
-              <li className="flex items-center justify-center">
-                <span className="w-2 h-2 bg-primary rounded-full mr-2 rtl:ml-2 rtl:mr-0"></span>
-                {isRtl ? "الدمام" : "Dammam"}
-              </li>
-            </ul>
-          </div>
-
-          {/* Delivery Time */}
-          <div className="card p-6">
-            <div className="flex items-center justify-center mb-4">
-              <Clock
-                size={32}
-                className="text-primary mr-2 rtl:ml-2 rtl:mr-0"
-              />
-              <h2 className="text-xl font-bold text-gray-800">
-                {isRtl ? "مدة التوصيل" : "Delivery Time"}
-              </h2>
-            </div>
-            <div className="mb-6">
-              <ProductImage
-                src="https://images.pexels.com/photos/190819/pexels-photo-190819.jpeg?auto=compress&cs=tinysrgb&w=400"
-                alt={isRtl ? "وقت التوصيل" : "Delivery Time"}
-                className="w-full h-32 object-cover rounded-lg"
-                width={400}
-                height={128}
-                aspectRatio="landscape"
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                quality={100}
-                priority={false}
-                showZoom={false}
-              />
-            </div>
-            <p className="text-gray-600 text-center">
-              {isRtl
-                ? "نضمن توصيل طلباتك خلال 24-48 ساعة داخل المدن المدعومة. التوصيل السريع متاح في نفس اليوم في مناطق محددة."
-                : "We ensure delivery within 24-48 hours in supported cities. Same-day express delivery is available in select areas."}
-            </p>
-          </div>
-
-          {/* Delivery Process */}
-          <div className="card p-6">
-            <div className="flex items-center justify-center mb-4">
-              <Truck
-                size={32}
-                className="text-primary mr-2 rtl:ml-2 rtl:mr-0"
-              />
-              <h2 className="text-xl font-bold text-gray-800">
-                {isRtl ? "عملية التوصيل" : "Delivery Process"}
-              </h2>
-            </div>
-            <div className="mb-6">
-              <ProductImage
-                src="https://images.pexels.com/photos/906494/pexels-photo-906494.jpeg?auto=compress&cs=tinysrgb&w=400"
-                alt={isRtl ? "عملية التوصيل" : "Delivery Process"}
-                className="w-full h-32 object-cover rounded-lg"
-                width={400}
-                height={128}
-                aspectRatio="landscape"
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                quality={100}
-                priority={false}
-                showZoom={false}
-              />
-            </div>
-            <p className="text-gray-600 text-center">
-              {isRtl
-                ? "نقوم بتعبئة طلباتك بعناية لضمان وصولها بحالة ممتازة. تابع طلبك بسهولة من خلال حسابك على موقعنا."
-                : "We carefully package your orders to ensure they arrive in perfect condition. Track your order easily through your account on our website."}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-12 text-center">
-          <a
-            href="/contact"
-            className="btn btn-primary inline-flex items-center"
+    <div
+      className="min-h-screen bg-gradient-to-br from-rose-50 to-purple-50 px-4 sm:px-6 lg:px-8 font-serif text-neutral-800"
+      dir={isRtl ? "rtl" : "ltr"}
+    >
+      <div className="max-w-7xl mx-auto py-12 sm:py-16 lg:py-20">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+        >
+          {/* Page Header */}
+          <motion.div
+            variants={itemVariants}
+            className="text-center mb-16 md:mb-20"
           >
-            {isRtl
-              ? "تواصل معنا للمزيد من المعلومات"
-              : "Contact Us for More Information"}
-          </a>
-        </div>
+            <Truck className="w-16 h-16 text-purple-600 mx-auto mb-4" />
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-purple-800 mb-4">
+              {isRtl ? "معلومات التوصيل" : "Delivery Information"}
+            </h1>
+            <p className="text-lg sm:text-xl text-neutral-600 max-w-3xl mx-auto leading-relaxed">
+              {isRtl
+                ? "نحن ملتزمون بتوصيل هداياكم الثمينة بسرعة وأمان. إليك كيف تتم العملية."
+                : "We are committed to delivering your precious gifts quickly and safely. Here's how our process works."}
+            </p>
+          </motion.div>
+
+          {/* Delivery Process Timeline */}
+          <motion.div
+            variants={containerVariants}
+            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12 sm:gap-8"
+          >
+            {deliverySteps.map((step, index) => (
+              <StepCard
+                key={index}
+                step={(index + 1).toString()}
+                icon={step.icon}
+                title={step.title}
+                description={step.description}
+              />
+            ))}
+          </motion.div>
+
+          <hr className="my-16 md:my-20 border-purple-100" />
+
+          {/* Key Information Section */}
+          <motion.div
+            variants={containerVariants}
+            className="grid md:grid-cols-2 gap-8"
+          >
+            <motion.div
+              variants={itemVariants}
+              className="bg-white p-8 rounded-2xl shadow-lg border border-neutral-100"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <MapPin className="w-8 h-8 text-purple-600" />
+                <h2 className="text-2xl font-bold">
+                  {isRtl ? "مناطق التوصيل" : "Our Delivery Zones"}
+                </h2>
+              </div>
+              <p className="text-neutral-600 mb-4">
+                {isRtl
+                  ? "نقدم حاليًا خدمات التوصيل في المدن الرئيسية التالية في مصر، مع خطط للتوسع قريبًا:"
+                  : "We currently offer delivery services in the following major cities in Egypt, with plans to expand soon:"}
+              </p>
+              <ul className="space-y-2">
+                {["القاهرة", "الجيزة", "الإسكندرية"].map((city, index) => (
+                  <li
+                    key={index}
+                    className="flex items-center gap-3 text-neutral-700 font-medium"
+                  >
+                    <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                    {city}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+            <motion.div
+              variants={itemVariants}
+              className="bg-white p-8 rounded-2xl shadow-lg border border-neutral-100"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <Clock className="w-8 h-8 text-pink-600" />
+                <h2 className="text-2xl font-bold">
+                  {isRtl ? "أوقات التوصيل" : "Delivery Times"}
+                </h2>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-bold text-neutral-800">
+                    {isRtl ? "التوصيل العادي" : "Standard Delivery"}
+                  </h3>
+                  <p className="text-neutral-600">
+                    {isRtl
+                      ? "يتم التوصيل خلال 24 إلى 48 ساعة من تأكيد الطلب."
+                      : "Delivered within 24 to 48 hours of order confirmation."}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-bold text-neutral-800">
+                    {isRtl ? "التوصيل في نفس اليوم" : "Same-Day Delivery"}
+                  </h3>
+                  <p className="text-neutral-600">
+                    {isRtl
+                      ? "متاح للطلبات المقدمة قبل الساعة 4 مساءً في مناطق محددة."
+                      : "Available for orders placed before 4 PM in select areas."}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* CTA Section */}
+          <motion.div variants={itemVariants} className="mt-16 text-center">
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-3 bg-purple-600 text-white px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:bg-purple-700 transition-colors duration-300"
+            >
+              <span>{isRtl ? "تواصل معنا للمزيد" : "Contact Us For More"}</span>
+              {isRtl ? <ArrowLeft size={22} /> : <ArrowRight size={22} />}
+            </Link>
+          </motion.div>
+        </motion.div>
       </div>
-    </section>
+    </div>
   );
 };
 

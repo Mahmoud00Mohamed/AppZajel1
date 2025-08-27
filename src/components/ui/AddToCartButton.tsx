@@ -56,7 +56,6 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     setIsAdding(true);
 
     try {
-      // Add to cart with proper structure
       addToCart({
         id: product.id,
         nameEn: product.nameEn,
@@ -66,22 +65,18 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
         quantity: quantity,
       });
 
-      // Show success animation
       setJustAdded(true);
 
-      // Show toast notification
+      // تم حذف كائن الـ action من هنا
       showSuccess(
         isRtl ? "تم الإضافة للسلة" : "Added to Cart",
         isRtl
           ? `تم إضافة ${product.nameAr} إلى عربة التسوق`
           : `${product.nameEn} added to cart`,
-        {
-          label: isRtl ? "عرض السلة" : "View Cart",
-          onClick: () => (window.location.href = "/cart"),
-        }
+        undefined, // <- تم حذف الزر
+        "cart-success"
       );
 
-      // Reset states after animation
       setTimeout(() => {
         setJustAdded(false);
         setIsAdding(false);
@@ -90,7 +85,6 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
       console.error("خطأ في إضافة المنتج إلى عربة التسوق:", error);
       setIsAdding(false);
 
-      // Show error message if toast context is available
       if (showSuccess) {
         showSuccess(
           isRtl ? "خطأ" : "Error",
@@ -146,8 +140,8 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
       onClick={handleAddToCart}
       disabled={isAdding || justAdded}
       className={`
-        flex items-center justify-center font-medium rounded-xl transition-all duration-300 
-        ${sizeClasses[size]} 
+        flex items-center justify-center font-medium rounded-xl transition-all duration-300
+        ${sizeClasses[size]}
         ${variantClasses[variant]}
         ${justAdded ? "bg-green-500 hover:bg-green-600" : ""}
         ${

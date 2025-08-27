@@ -1,15 +1,111 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
-import { ProductImage } from "../features/images";
+import { Link } from "react-router-dom";
+import {
+  ChevronDown,
+  MessageSquare,
+  ShoppingCart,
+  Truck,
+  CreditCard,
+  HelpCircle,
+} from "lucide-react";
+import { motion, AnimatePresence, Variants } from "framer-motion";
+
+// Define a specific type for the FAQ data to avoid using 'any'
+interface FaqData {
+  questionEn: string;
+  questionAr: string;
+  answerEn: string;
+  answerAr: string;
+}
+
+// Animation Variants for smooth open/close
+const answerVariants: Variants = {
+  hidden: { opacity: 0, height: 0, y: -10 },
+  visible: {
+    opacity: 1,
+    height: "auto",
+    y: 0,
+    transition: {
+      type: "spring",
+      damping: 20,
+      stiffness: 200,
+    },
+  },
+  exit: {
+    opacity: 0,
+    height: 0,
+    y: -10,
+    transition: {
+      duration: 0.2,
+    },
+  },
+};
+
+const FAQItem: React.FC<{
+  faq: FaqData; // Use the specific FaqData type instead of 'any'
+  index: number;
+  openIndex: number | null;
+  setOpenIndex: (index: number | null) => void;
+  isArabic: boolean;
+}> = ({ faq, index, openIndex, setOpenIndex, isArabic }) => {
+  const isOpen = openIndex === index;
+
+  return (
+    <div className="border-b border-purple-100 last:border-b-0">
+      <button
+        className={`w-full px-2 py-6 flex justify-between items-center text-lg font-semibold text-neutral-800 focus:outline-none ${
+          isArabic ? "text-right" : "text-left"
+        }`}
+        onClick={() => setOpenIndex(isOpen ? null : index)}
+        aria-expanded={isOpen}
+      >
+        <span className="flex-1">
+          {isArabic ? faq.questionAr : faq.questionEn}
+        </span>
+        <motion.span
+          className="ms-4"
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+        >
+          <ChevronDown
+            className={`w-6 h-6 text-purple-500 transition-colors ${
+              isOpen ? "text-purple-700" : ""
+            }`}
+          />
+        </motion.span>
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            variants={answerVariants}
+            className="overflow-hidden"
+          >
+            <div
+              className={`px-2 pb-6 text-neutral-600 leading-relaxed text-base ${
+                isArabic ? "text-right" : "text-left"
+              }`}
+            >
+              {isArabic ? faq.answerAr : faq.answerEn}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 const FAQPage: React.FC = () => {
   const { i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
 
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
-  const faqs = [
+  // Apply the FaqData type to the array
+  const faqs: FaqData[] = [
     {
       questionEn: "How can I track my order?",
       questionAr: "كيف يمكنني تتبع طلبي؟",
@@ -19,12 +115,12 @@ const FAQPage: React.FC = () => {
         "يمكنك تتبع طلبك عن طريق تسجيل الدخول إلى حسابك وزيارة قسم تتبع الطلب. ستتلقى أيضًا تحديثات عبر البريد الإلكتروني حول حالة طلبك.",
     },
     {
-      questionEn: "What are your delivery hours?",
-      questionAr: "ما هي ساعات التوصيل لديكم؟",
+      questionEn: "What are your delivery hours in Egypt?",
+      questionAr: "ما هي ساعات التوصيل لديكم في مصر؟",
       answerEn:
-        "We deliver from 9 AM to 10 PM every day across Saudi Arabia. For special occasions like Eid, we extend our delivery hours.",
+        "We deliver from 9 AM to 10 PM every day across Egypt. For special occasions like Eid, we extend our delivery hours.",
       answerAr:
-        "نقوم بالتوصيل من 9 صباحًا حتى 10 مساءً كل يوم في جميع أنحاء السعودية. في المناسبات الخاصة مثل العيد، نقوم بتمديد ساعات التوصيل.",
+        "نقوم بالتوصيل من 9 صباحًا حتى 10 مساءً كل يوم في جميع أنحاء مصر. في المناسبات الخاصة مثل العيد، نقوم بتمديد ساعات التوصيل.",
     },
     {
       questionEn: "Can I modify or cancel my order?",
@@ -52,92 +148,107 @@ const FAQPage: React.FC = () => {
     },
   ];
 
+  const categories = [
+    {
+      nameEn: "Orders & Tracking",
+      nameAr: "الطلبات والتتبع",
+      icon: <ShoppingCart size={20} />,
+    },
+    { nameEn: "Shipping", nameAr: "الشحن", icon: <Truck size={20} /> },
+    { nameEn: "Payments", nameAr: "المدفوعات", icon: <CreditCard size={20} /> },
+    { nameEn: "General", nameAr: "أسئلة عامة", icon: <HelpCircle size={20} /> },
+  ];
+
   return (
-    <div className="container-custom py-12">
-      <div className="text-center mb-12">
-        <div className="mb-8">
-          <ProductImage
-            src="https://images.pexels.com/photos/5428010/pexels-photo-5428010.jpeg?auto=compress&cs=tinysrgb&w=800"
-            alt={isArabic ? "الأسئلة الشائعة" : "Frequently Asked Questions"}
-            className="w-full h-64 object-cover rounded-2xl shadow-lg"
-            width={800}
-            height={256}
-            aspectRatio="landscape"
-            sizes="100vw"
-            quality={85}
-            priority={true}
-            showZoom={false}
-          />
-        </div>
-        <h1 className="text-3xl font-bold mb-4 text-gray-800">
-          {isArabic ? "الأسئلة الشائعة" : "Frequently Asked Questions"}
-        </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          {isArabic
-            ? "نجيب على أكثر الأسئلة شيوعاً لمساعدتك في الحصول على أفضل تجربة تسوق"
-            : "We answer the most common questions to help you get the best shopping experience"}
-        </p>
-      </div>
-
-      <div className="max-w-3xl mx-auto">
-        <div className="space-y-4">
-          {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100"
-            >
-              <button
-                className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors"
-                onClick={() => setOpenIndex(openIndex === index ? null : index)}
-              >
-                <span className="font-medium flex items-center gap-3">
-                  <HelpCircle size={20} className="text-primary" />
-                  {isArabic ? faq.questionAr : faq.questionEn}
-                </span>
-                {openIndex === index ? (
-                  <ChevronUp className="w-5 h-5 text-gray-500" />
-                ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-500" />
-                )}
-              </button>
-
-              {openIndex === index && (
-                <div className="px-6 pb-4 text-gray-600 border-t border-gray-100 pt-4">
-                  {isArabic ? faq.answerAr : faq.answerEn}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-12 bg-primary/5 p-8 rounded-2xl text-center">
-          <div className="mb-6">
-            <ProductImage
-              src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=400"
-              alt={isArabic ? "خدمة العملاء" : "Customer Service"}
-              className="w-24 h-24 object-cover rounded-full mx-auto shadow-lg"
-              width={96}
-              height={96}
-              aspectRatio="square"
-              sizes="96px"
-              quality={80}
-              showZoom={false}
-            />
-          </div>
-          <h2 className="text-xl font-semibold mb-4">
-            {isArabic ? "هل لديك المزيد من الأسئلة؟" : "Still have questions?"}
-          </h2>
-          <p className="text-gray-600 mb-6">
+    <div
+      className="min-h-screen bg-gradient-to-br from-rose-50 to-purple-50 px-4 sm:px-6 lg:px-8 font-serif text-neutral-800"
+      dir={isArabic ? "rtl" : "ltr"}
+    >
+      <div className="max-w-7xl mx-auto py-12 sm:py-16 lg:py-20">
+        <div className="text-center mb-12 md:mb-16">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-purple-800 mb-4">
+            {isArabic ? "مركز المساعدة" : "Help Center"}
+          </h1>
+          <p className="text-lg sm:text-xl text-neutral-600 max-w-3xl mx-auto leading-relaxed">
             {isArabic
-              ? "فريق خدمة العملاء لدينا متاح للمساعدة على مدار الساعة"
-              : "Our customer support team is here to help 24/7"}
+              ? "كل ما تحتاج معرفته. هل لم تجد إجابتك؟ تواصل معنا."
+              : "Everything you need to know. Can't find an answer? Contact us."}
           </p>
-          <a
-            href="/contact"
-            className="inline-block bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition-colors shadow-lg"
-          >
-            {isArabic ? "اتصل بنا" : "Contact Us"}
-          </a>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-12">
+          {/* Left Sidebar */}
+          <aside className="lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6 sticky top-8">
+              <h2
+                className={`text-2xl font-bold mb-6 ${
+                  isArabic ? "text-right" : "text-left"
+                }`}
+              >
+                {isArabic ? "المواضيع" : "Topics"}
+              </h2>
+              <div className="space-y-3">
+                {categories.map((cat, index) => (
+                  <a
+                    href="#"
+                    key={index}
+                    className={`flex items-center gap-3 p-3 rounded-lg font-semibold transition-colors duration-200 ${
+                      index === 0
+                        ? "bg-purple-100 text-purple-800"
+                        : "text-neutral-600 hover:bg-purple-50"
+                    }`}
+                  >
+                    {cat.icon}
+                    <span>{isArabic ? cat.nameAr : cat.nameEn}</span>
+                  </a>
+                ))}
+              </div>
+              <div className="mt-10 bg-purple-50 p-6 rounded-xl text-center">
+                <MessageSquare className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold mb-2">
+                  {isArabic
+                    ? "هل لديك المزيد من الأسئلة؟"
+                    : "Still have questions?"}
+                </h3>
+                <p className="text-neutral-600 mb-6">
+                  {isArabic
+                    ? "فريقنا متاح للمساعدة والإجابة على استفساراتك."
+                    : "Our team is here to help and answer your inquiries."}
+                </p>
+                <Link
+                  to="/contact"
+                  className="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg font-bold shadow-md transition-colors duration-300 hover:bg-purple-700 focus:outline-none"
+                >
+                  {isArabic ? "اتصل بنا" : "Contact Us"}
+                </Link>
+              </div>
+            </div>
+          </aside>
+
+          {/* Right Content: FAQ List */}
+          <main className="lg:col-span-2">
+            <div className="bg-white rounded-2xl shadow-lg border border-neutral-100 p-6 sm:p-8">
+              <h2
+                className={`text-3xl font-bold mb-6 ${
+                  isArabic ? "text-right" : "text-left"
+                }`}
+              >
+                {isArabic ? "الطلبات والتتبع" : "Orders & Tracking"}
+              </h2>
+              <div>
+                {faqs.map((faq, index) => (
+                  <FAQItem
+                    key={index}
+                    index={index}
+                    faq={faq}
+                    openIndex={openIndex}
+                    setOpenIndex={setOpenIndex}
+                    isArabic={isArabic}
+                  />
+                ))}
+              </div>
+            </div>
+          </main>
         </div>
       </div>
     </div>
