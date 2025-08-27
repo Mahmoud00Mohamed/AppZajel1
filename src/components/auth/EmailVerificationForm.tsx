@@ -40,7 +40,6 @@ const EmailVerificationForm: React.FC = () => {
 
     try {
       await verifyEmail(email, verificationCode);
-      // بعد تأكيد البريد الإلكتروني، انتقل إلى صفحة إعداد الهاتف
       navigate("/auth/phone-setup");
     } catch (error) {
       console.error("Verification error:", error);
@@ -64,7 +63,7 @@ const EmailVerificationForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-purple-50 flex items-center justify-center p-4 font-serif text-neutral-800">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -79,7 +78,7 @@ const EmailVerificationForm: React.FC = () => {
           >
             <Mail className="w-8 h-8 text-white" />
           </motion.div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl font-bold text-purple-800 mb-2">
             {isRtl ? "تحقق من بريدك الإلكتروني" : "Verify Your Email"}
           </h1>
           <p className="text-gray-600 mb-4">

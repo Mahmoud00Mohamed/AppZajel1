@@ -25,9 +25,7 @@ const ForgotPasswordForm: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Get reCAPTCHA token
       const captchaToken = await executeRecaptcha();
-
       await requestPasswordReset(email, captchaToken);
       setIsSuccess(true);
     } catch (error) {
@@ -39,7 +37,7 @@ const ForgotPasswordForm: React.FC = () => {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 to-purple-50 flex items-center justify-center p-4 font-serif text-neutral-800">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -54,7 +52,7 @@ const ForgotPasswordForm: React.FC = () => {
             <CheckCircle className="w-8 h-8 text-white" />
           </motion.div>
 
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+          <h1 className="text-2xl font-bold text-purple-800 mb-4">
             {isRtl ? "تم إرسال الرابط" : "Link Sent"}
           </h1>
           <p className="text-gray-600 mb-6">
@@ -77,7 +75,7 @@ const ForgotPasswordForm: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-purple-50 flex items-center justify-center p-4 font-serif text-neutral-800">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -92,7 +90,7 @@ const ForgotPasswordForm: React.FC = () => {
           >
             <Key className="w-8 h-8 text-white" />
           </motion.div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl font-bold text-purple-800 mb-2">
             {isRtl ? "نسيت كلمة المرور؟" : "Forgot Password?"}
           </h1>
           <p className="text-gray-600">

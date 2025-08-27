@@ -35,7 +35,6 @@ const GoogleCallbackPage: React.FC = () => {
             errorMessage = "حدث خطأ غير متوقع";
         }
 
-        // إظهار رسالة الخطأ للمستخدم
         alert(errorMessage);
         setTimeout(() => navigate("/auth/login"), 3000);
         return;
@@ -65,7 +64,7 @@ const GoogleCallbackPage: React.FC = () => {
   const hasToken = searchParams.get("accessToken");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-purple-50 flex items-center justify-center p-4 font-serif text-neutral-800">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -90,7 +89,7 @@ const GoogleCallbackPage: React.FC = () => {
 
         {hasError ? (
           <>
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">
+            <h1 className="text-2xl font-bold text-purple-800 mb-4">
               {isRtl ? "فشل في المصادقة" : "Authentication Failed"}
             </h1>
             <p className="text-gray-600 mb-6">
@@ -101,7 +100,7 @@ const GoogleCallbackPage: React.FC = () => {
           </>
         ) : hasToken ? (
           <>
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">
+            <h1 className="text-2xl font-bold text-purple-800 mb-4">
               {isRtl ? "تم تسجيل الدخول بنجاح" : "Successfully Signed In"}
             </h1>
             <p className="text-gray-600 mb-6">
@@ -112,7 +111,7 @@ const GoogleCallbackPage: React.FC = () => {
           </>
         ) : (
           <>
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">
+            <h1 className="text-2xl font-bold text-purple-800 mb-4">
               {isRtl ? "جاري المعالجة..." : "Processing..."}
             </h1>
             <p className="text-gray-600 mb-6">

@@ -10,6 +10,7 @@ import {
   Phone,
   ArrowRight,
   ArrowLeft,
+  LogIn,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useRecaptcha } from "../../hooks/useRecaptcha";
@@ -41,7 +42,6 @@ const LoginForm: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Get reCAPTCHA token for email login only
       let captchaToken = "dummy-captcha-token";
       if (loginMethod === "email") {
         captchaToken = await executeRecaptcha();
@@ -71,12 +71,11 @@ const LoginForm: React.FC = () => {
   };
 
   const handleGoogleLogin = () => {
-    // إعادة توجيه مباشرة لـ Google OAuth في نفس الصفحة
     window.location.href = `${API_BASE_URL}/google`;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-purple-50 flex items-center justify-center p-4 font-serif text-neutral-800">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -87,11 +86,11 @@ const LoginForm: React.FC = () => {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-            className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4"
+            className="w-16 h-16 bg-gradient-to-r from-purple-600 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4"
           >
-            <Mail className="w-8 h-8 text-white" />
+            <LogIn className="w-8 h-8 text-white" />
           </motion.div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl font-bold text-purple-800 mb-2">
             {isRtl ? "تسجيل الدخول" : "Sign In"}
           </h1>
           <p className="text-gray-600">
@@ -227,7 +226,7 @@ const LoginForm: React.FC = () => {
           <motion.button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-4 rounded-xl font-medium hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 px-4 rounded-xl font-medium hover:from-purple-700 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >

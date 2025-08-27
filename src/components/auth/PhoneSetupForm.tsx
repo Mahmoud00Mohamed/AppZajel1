@@ -69,7 +69,7 @@ const PhoneSetupForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-purple-50 flex items-center justify-center p-4 font-serif text-neutral-800">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -88,7 +88,7 @@ const PhoneSetupForm: React.FC = () => {
               <Shield className="w-8 h-8 text-white" />
             )}
           </motion.div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          <h1 className="text-2xl font-bold text-purple-800 mb-2">
             {step === "input"
               ? isRtl
                 ? "أضف رقم هاتفك"
@@ -138,21 +138,30 @@ const PhoneSetupForm: React.FC = () => {
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
               <h4 className="font-medium text-blue-800 mb-2 flex items-center gap-2">
                 <Shield size={16} />
-                {isRtl ? "لماذا نحتاج رقم هاتفك؟" : "Why do we need your phone number?"}
+                {isRtl
+                  ? "لماذا نحتاج رقم هاتفك؟"
+                  : "Why do we need your phone number?"}
               </h4>
               <ul className="text-blue-700 text-sm space-y-1">
                 <li>
-                  • {isRtl ? "تأمين حسابك بشكل إضافي" : "Additional account security"}
+                  •{" "}
+                  {isRtl
+                    ? "تأمين حسابك بشكل إضافي"
+                    : "Additional account security"}
                 </li>
                 <li>
-                  • {isRtl ? "إشعارات الطلبات المهمة" : "Important order notifications"}
+                  •{" "}
+                  {isRtl
+                    ? "إشعارات الطلبات المهمة"
+                    : "Important order notifications"}
                 </li>
                 <li>
-                  • {isRtl ? "تسجيل دخول سريع بالهاتف" : "Quick phone login option"}
+                  •{" "}
+                  {isRtl
+                    ? "تسجيل دخول سريع بالهاتف"
+                    : "Quick phone login option"}
                 </li>
-                <li>
-                  • {isRtl ? "تحديثات التوصيل" : "Delivery updates"}
-                </li>
+                <li>• {isRtl ? "تحديثات التوصيل" : "Delivery updates"}</li>
               </ul>
             </div>
 
@@ -168,7 +177,9 @@ const PhoneSetupForm: React.FC = () => {
               ) : (
                 <>
                   <Send size={18} />
-                  <span>{isRtl ? "إرسال رمز التحقق" : "Send Verification Code"}</span>
+                  <span>
+                    {isRtl ? "إرسال رمز التحقق" : "Send Verification Code"}
+                  </span>
                 </>
               )}
             </motion.button>
@@ -177,7 +188,9 @@ const PhoneSetupForm: React.FC = () => {
           <form onSubmit={handleVerificationSubmit} className="space-y-6">
             <div className="text-center mb-6">
               <p className="text-gray-600 mb-2">
-                {isRtl ? "تم إرسال رمز التحقق إلى:" : "Verification code sent to:"}
+                {isRtl
+                  ? "تم إرسال رمز التحقق إلى:"
+                  : "Verification code sent to:"}
               </p>
               <p className="text-green-600 font-medium">
                 {phoneNumber.replace(/(\+\d{1,3})\d+(\d{4})/, "$1****$2")}
@@ -211,7 +224,11 @@ const PhoneSetupForm: React.FC = () => {
               ) : (
                 <>
                   <CheckCircle size={18} />
-                  <span>{isRtl ? "تأكيد وإنهاء التسجيل" : "Verify & Complete Registration"}</span>
+                  <span>
+                    {isRtl
+                      ? "تأكيد وإنهاء التسجيل"
+                      : "Verify & Complete Registration"}
+                  </span>
                 </>
               )}
             </motion.button>
@@ -233,7 +250,9 @@ const PhoneSetupForm: React.FC = () => {
                 )}
                 <span>
                   {countdown > 0
-                    ? `${isRtl ? "إعادة الإرسال خلال" : "Resend in"} ${countdown}s`
+                    ? `${
+                        isRtl ? "إعادة الإرسال خلال" : "Resend in"
+                      } ${countdown}s`
                     : isRtl
                     ? "إعادة إرسال الرمز"
                     : "Resend Code"}
