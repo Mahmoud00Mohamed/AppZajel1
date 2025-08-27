@@ -132,7 +132,7 @@ const ShippingDeliverySection: React.FC = () => {
             <div className="relative w-full rounded-2xl md:rounded-3xl overflow-hidden scale-90 md:scale-75 lg:scale-75 transform transition-all duration-300 ">
               <div className="absolute inset-0 shadow-lg z-10"></div>
               <ProductImage
-                src="/public/photo/Delivery.png"
+                src="/photo/Delivery.png"
                 alt={t("home.shipping.imageAlt")}
                 className="w-full h-auto object-contain rounded-t-2xl md:rounded-t-3xl relative z-0"
                 width={1260}
