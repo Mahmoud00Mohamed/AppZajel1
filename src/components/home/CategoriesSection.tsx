@@ -167,7 +167,7 @@ const CategoriesSection: React.FC = () => {
                       <ProductImage
                         src={category.imageUrl}
                         alt={t(category.nameKey)}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-2"
+                        className="w-full h-full object-cover transition-transform duration-700 hover:scale-110 "
                         width={160}
                         height={160}
                         aspectRatio="square"
@@ -178,8 +178,8 @@ const CategoriesSection: React.FC = () => {
                         placeholderSize={28}
                         fallbackSrc="https://images.pexels.com/photos/1058775/pexels-photo-1058775.jpeg?auto=compress&cs=tinysrgb&w=400"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end justify-center p-4 transition-opacity duration-300 group-hover:opacity-90">
-                        <h3 className="text-base font-semibold text-white text-center transform transition-transform duration-300 group-hover:-translate-y-1">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end justify-center p-4 transition-opacity duration-300 ">
+                        <h3 className="text-base font-semibold text-white text-center transform transition-transform duration-300 ">
                           {t(category.nameKey)}
                         </h3>
                       </div>
@@ -190,7 +190,7 @@ const CategoriesSection: React.FC = () => {
             ))}
 
             {/* الكارت الوهمي */}
-            <div className="flex-shrink-0 w-40 sm:w-40 md:w-48 snap-center pointer-events-none"></div>
+            <div className="flex-shrink-0 w-40 sm:w-40 md:w-48 snap-center pointer-events-none block md:hidden"></div>
           </div>
         </div>
       </div>
