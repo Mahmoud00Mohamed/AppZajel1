@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 // لم نعد بحاجة لـ Gift
 // import { Gift } from "lucide-react";
 
-import PigeonIcon from "/photo/dove-bird-svgrepo-com (2).svg"; // ← استيراد SVG كصورة
+import PigeonIcon from "/photo/Logo.svg"; // ← استيراد SVG كصورة
 
 interface LogoProps {
   small?: boolean;

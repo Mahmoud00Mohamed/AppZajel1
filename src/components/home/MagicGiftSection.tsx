@@ -11,7 +11,8 @@ const MagicGiftSection: React.FC = () => {
     <section
       className="py-14 sm:py-18"
       style={{
-        backgroundImage: "url('/photo/MagicGiftSection.png')",
+        backgroundImage:
+          "url('https://res.cloudinary.com/djpl34pm6/image/upload/v1756382835/MagicGiftSection_knzvpy.png')",
         backgroundSize: "contain",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",

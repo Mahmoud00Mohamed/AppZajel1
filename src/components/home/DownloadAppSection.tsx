@@ -55,7 +55,7 @@ const DownloadAppSection: React.FC = () => {
         <div className="p-6 sm:p-12 md:p-16">
           <div className="max-w-2xl mx-auto text-center">
             <img
-              src="/photo/DownloadAppSection.png"
+              src="https://res.cloudinary.com/djpl34pm6/image/upload/v1756382841/DownloadAppSection_uwewjn.png"
               alt={t("home.downloadApp.title")}
               className="w-32 h-32 sm:w-40 sm:h-40 mx-auto mb-6 rounded-lg object-cover"
             />
