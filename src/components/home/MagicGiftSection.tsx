@@ -9,7 +9,7 @@ const MagicGiftSection: React.FC = () => {
 
   return (
     <section
-      className="py-14 sm:py-18"
+      className="py-3 sm:py-12"
       style={{
         backgroundImage:
           "url('https://res.cloudinary.com/djpl34pm6/image/upload/v1756382835/MagicGiftSection_knzvpy.png')",

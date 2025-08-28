@@ -50,7 +50,7 @@ const DownloadAppSection: React.FC = () => {
   );
 
   return (
-    <section className="py-4">
+    <section className="py-3 sm:py-12">
       <div className="container-custom px-4 sm:px-6">
         <div className="p-6 sm:p-12 md:p-16">
           <div className="max-w-2xl mx-auto text-center">

@@ -45,7 +45,7 @@ const FeaturedCollectionsSection: React.FC = () => {
   const nextDirection = isRtl ? "left" : "right";
 
   return (
-    <section className="py-0 sm:py-18 ">
+    <section className="py-3 sm:py-12">
       <div className="container-custom px-4 sm:px-6">
         <div className="text-center mb-10">
           <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-medium text-purple-800 leading-tight">
