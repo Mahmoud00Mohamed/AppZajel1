@@ -504,7 +504,7 @@ const ProductPage: React.FC = () => {
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex-1 py-3 px-3 font-bold transition-all flex items-center justify-center gap-1.5 relative text-sm ${
                       activeTab === tab.id
-                        ? "text-purple-600 bg-white border-b-2 border-purple-600"
+                        ? "text-purple-600 bg-white"
                         : "text-neutral-600 hover:text-neutral-800 hover:bg-neutral-100"
                     }`}
                   >
@@ -512,8 +512,14 @@ const ProductPage: React.FC = () => {
                     <span className="hidden sm:inline">{tab.label}</span>
                     {activeTab === tab.id && (
                       <motion.div
+                        layout
                         layoutId="activeTab"
                         className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600"
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 30,
+                        }}
                       />
                     )}
                   </button>

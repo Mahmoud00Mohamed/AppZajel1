@@ -140,18 +140,17 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
       onClick={handleAddToCart}
       disabled={isAdding || justAdded}
       className={`
-        flex items-center justify-center font-medium rounded-xl transition-all duration-300
-        ${sizeClasses[size]}
-        ${variantClasses[variant]}
-        ${justAdded ? "bg-green-500 hover:bg-green-600" : ""}
-        ${
-          isAdding || justAdded
-            ? "cursor-not-allowed opacity-90"
-            : "hover:shadow-lg"
-        }
-        ${className}
-      `}
-      whileHover={!isAdding && !justAdded ? { scale: 1.05 } : {}}
+    flex items-center justify-center font-medium rounded-xl transition-all duration-300
+    ${sizeClasses[size]}
+    ${variantClasses[variant]}
+    ${justAdded ? "bg-green-500 hover:bg-green-600" : ""}
+    ${
+      isAdding || justAdded
+        ? "cursor-not-allowed opacity-90"
+        : "hover:shadow-lg"
+    }
+    ${className}
+  `}
       whileTap={!isAdding && !justAdded ? { scale: 0.95 } : {}}
       aria-label={
         isRtl
