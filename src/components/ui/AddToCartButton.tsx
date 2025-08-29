@@ -4,6 +4,7 @@ import { ShoppingCart, Check } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useToast } from "../../context/ToastContext";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../context/AuthContext";
 
 interface AddToCartButtonProps {
   product: {
@@ -31,6 +32,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   const { addToCart } = useCart();
   const { showSuccess } = useToast();
   const { t, i18n } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const isRtl = i18n.language === "ar";
   const [isAdding, setIsAdding] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
@@ -50,6 +52,14 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (!isAuthenticated) {
+      showSuccess(
+        "تسجيل الدخول مطلوب",
+        "يجب تسجيل الدخول لإضافة المنتجات إلى السلة"
+      );
+      return;
+    }
 
     if (isAdding || justAdded) return;
 
