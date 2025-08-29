@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   User,
@@ -17,6 +18,8 @@ import {
 } from "lucide-react";
 import { useUser } from "../../context/UserContext";
 import { useAuth } from "../../context/AuthContext";
+import { useFavorites } from "../../context/FavoritesContext";
+import { useCart } from "../../context/CartContext";
 import ProfileForm from "../../components/user/ProfileForm";
 import PasswordUpdateForm from "../../components/user/PasswordUpdateForm";
 import EmailUpdateForm from "../../components/user/EmailUpdateForm";
@@ -27,6 +30,8 @@ const ProfilePage: React.FC = () => {
   const isRtl = i18n.language === "ar";
   const { profile } = useUser();
   const { user } = useAuth();
+  const { favoritesCount } = useFavorites();
+  const { cartCount } = useCart();
   const [activeTab, setActiveTab] = useState("profile");
 
   const tabs = [
@@ -70,7 +75,7 @@ const ProfilePage: React.FC = () => {
     {
       icon: <Heart size={24} className="text-pink-600" />,
       label: isRtl ? "المفضلة" : "Favorites",
-      value: "8",
+      value: favoritesCount.toString(),
       color: "from-pink-50 to-pink-100",
     },
     {
@@ -78,6 +83,12 @@ const ProfilePage: React.FC = () => {
       label: isRtl ? "نقاط الولاء" : "Loyalty Points",
       value: "1,250",
       color: "from-amber-50 to-amber-100",
+    },
+    {
+      icon: <Package size={24} className="text-blue-600" />,
+      label: isRtl ? "السلة" : "Cart Items",
+      value: cartCount.toString(),
+      color: "from-blue-50 to-blue-100",
     },
   ];
 
@@ -256,14 +267,41 @@ const ProfilePage: React.FC = () => {
                   {isRtl ? "إجراءات سريعة" : "Quick Actions"}
                 </h4>
                 <div className="space-y-2">
-                  <button className="w-full flex items-center gap-3 px-3 py-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all text-sm">
+                  <Link
+                    to="/orders"
+                    className="w-full flex items-center gap-3 px-3 py-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all text-sm"
+                  >
                     <Package size={16} />
                     <span>{isRtl ? "طلباتي" : "My Orders"}</span>
-                  </button>
-                  <button className="w-full flex items-center gap-3 px-3 py-2 text-gray-600 hover:text-pink-600 hover:bg-pink-50 rounded-lg transition-all text-sm">
+                  </Link>
+                  <Link
+                    to="/favorites"
+                    className="w-full flex items-center gap-3 px-3 py-2 text-gray-600 hover:text-pink-600 hover:bg-pink-50 rounded-lg transition-all text-sm"
+                  >
                     <Heart size={16} />
-                    <span>{isRtl ? "المفضلة" : "Favorites"}</span>
-                  </button>
+                    <div className="flex items-center justify-between flex-1">
+                      <span>{isRtl ? "المفضلة" : "Favorites"}</span>
+                      {favoritesCount > 0 && (
+                        <span className="bg-pink-100 text-pink-600 text-xs px-2 py-1 rounded-full font-medium">
+                          {favoritesCount}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
+                  <Link
+                    to="/cart"
+                    className="w-full flex items-center gap-3 px-3 py-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all text-sm"
+                  >
+                    <Package size={16} />
+                    <div className="flex items-center justify-between flex-1">
+                      <span>{isRtl ? "عربة التسوق" : "Shopping Cart"}</span>
+                      {cartCount > 0 && (
+                        <span className="bg-blue-100 text-blue-600 text-xs px-2 py-1 rounded-full font-medium">
+                          {cartCount}
+                        </span>
+                      )}
+                    </div>
+                  </Link>
                 </div>
               </div>
             </div>
