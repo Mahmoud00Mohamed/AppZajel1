@@ -77,16 +77,6 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 
       setJustAdded(true);
 
-      // تم حذف كائن الـ action من هنا
-      showSuccess(
-        isRtl ? "تم الإضافة للسلة" : "Added to Cart",
-        isRtl
-          ? `تم إضافة ${product.nameAr} إلى عربة التسوق`
-          : `${product.nameEn} added to cart`,
-        undefined, // <- تم حذف الزر
-        "cart-success"
-      );
-
       setTimeout(() => {
         setJustAdded(false);
         setIsAdding(false);
@@ -95,12 +85,6 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
       console.error("خطأ في إضافة المنتج إلى عربة التسوق:", error);
       setIsAdding(false);
 
-      if (showSuccess) {
-        showSuccess(
-          isRtl ? "خطأ" : "Error",
-          isRtl ? "حدث خطأ أثناء إضافة المنتج" : "Error adding product to cart"
-        );
-      }
     }
   };
 
