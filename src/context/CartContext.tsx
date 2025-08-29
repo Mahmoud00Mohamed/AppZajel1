@@ -26,6 +26,8 @@ interface CartContextType {
   clearCart: () => void;
   cartCount: number;
   cartTotal: number;
+  isLoading: boolean;
+  refreshCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -53,9 +55,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       // Clear cart when user logs out
       setCart([]);
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, refreshCart]);
 
-  const refreshCart = async () => {
+  const refreshCart = useCallback(async () => {
     if (!isAuthenticated) return;
 
     setIsLoading(true);
@@ -76,7 +78,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isAuthenticated]);
 
   const addToCart = (product: CartItem) => {
     if (!isAuthenticated) {
@@ -293,6 +295,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         clearCart,
         cartCount,
         cartTotal,
+        isLoading,
+        refreshCart,
         isLoading,
         refreshCart,
       }}
