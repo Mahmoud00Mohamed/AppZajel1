@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Mail, RefreshCw, CheckCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 
 const EmailVerificationForm: React.FC = () => {
   const { i18n } = useTranslation();
@@ -11,6 +12,7 @@ const EmailVerificationForm: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { verifyEmail, resendCode } = useAuth();
+  const { syncCart } = useCart();
 
   const [verificationCode, setVerificationCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +42,7 @@ const EmailVerificationForm: React.FC = () => {
 
     try {
       await verifyEmail(email, verificationCode);
+      await syncCart();
       navigate("/auth/phone-setup");
     } catch (error) {
       console.error("Verification error:", error);

@@ -6,7 +6,6 @@ import {
   ReactNode,
 } from "react";
 import { useToast } from "./ToastContext";
-import { useCart } from "./CartContext";
 
 interface User {
   id: string;
@@ -54,7 +53,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { showSuccess, showError } = useToast();
-  const cartContext = useCart();
 
   const isAuthenticated = !!user;
 
@@ -115,10 +113,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (response.ok) {
         localStorage.setItem("accessToken", data.accessToken);
         await checkAuthStatus();
-        // Sync cart after successful login
-        if (cartContext?.syncCart) {
-          await cartContext.syncCart();
-        }
         showSuccess("تم تسجيل الدخول بنجاح", "مرحباً بك مرة أخرى!");
       } else {
         throw new Error(data.message || "فشل في تسجيل الدخول");
@@ -189,10 +183,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (response.ok) {
         localStorage.setItem("accessToken", data.accessToken);
         await checkAuthStatus();
-        // Sync cart after successful verification
-        if (cartContext?.syncCart) {
-          await cartContext.syncCart();
-        }
         showSuccess("تم التحقق من البريد الإلكتروني", data.message);
       } else {
         throw new Error(data.message || "فشل في التحقق من البريد الإلكتروني");
@@ -390,10 +380,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (response.ok) {
         localStorage.setItem("accessToken", data.accessToken);
         await checkAuthStatus();
-        // Sync cart after successful phone login
-        if (cartContext?.syncCart) {
-          await cartContext.syncCart();
-        }
         showSuccess("تم تسجيل الدخول بنجاح", data.message);
       } else {
         throw new Error(data.message || "فشل في تسجيل الدخول");

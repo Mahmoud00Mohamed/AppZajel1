@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { CheckCircle, AlertCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
 
 const GoogleCallbackPage: React.FC = () => {
   const { i18n } = useTranslation();
@@ -11,6 +12,7 @@ const GoogleCallbackPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { refreshToken } = useAuth();
+  const { syncCart } = useCart();
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -46,6 +48,7 @@ const GoogleCallbackPage: React.FC = () => {
 
         try {
           await refreshToken();
+          await syncCart();
           setTimeout(() => navigate("/"), 1500);
         } catch (refreshError) {
           console.error("Error refreshing token:", refreshError);
