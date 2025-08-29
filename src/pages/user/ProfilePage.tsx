@@ -87,7 +87,7 @@ const ProfilePage: React.FC = () => {
     {
       icon: <Package size={24} className="text-blue-600" />,
       label: isRtl ? "السلة" : "Cart Items",
-      value: isAuthenticated ? cartCount.toString() : "0",
+      value: cartCount.toString(),
       color: "from-blue-50 to-blue-100",
     },
   ];
