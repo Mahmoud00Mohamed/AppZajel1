@@ -4,6 +4,7 @@ import {
   useContext,
   useState,
   useEffect,
+  useCallback,
   ReactNode,
 } from "react";
 import { useAuth } from "./AuthContext";
@@ -296,8 +297,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         clearCart,
         cartCount,
         cartTotal,
-        isLoading,
-        refreshCart,
         isLoading,
         refreshCart,
       }}
