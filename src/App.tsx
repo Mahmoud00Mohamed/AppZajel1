@@ -80,9 +80,9 @@ function App() {
 
   return (
     <ToastProvider>
-      <AuthProvider>
-        <UserProvider>
-          <CartProvider>
+      <CartProvider>
+        <AuthProvider>
+          <UserProvider>
             <FavoritesProvider>
               <div
                 className={`min-h-screen flex flex-col ${
@@ -237,9 +237,9 @@ function App() {
                 <BottomNavigation />
               </div>
             </FavoritesProvider>
-          </CartProvider>
-        </UserProvider>
-      </AuthProvider>
+          </UserProvider>
+        </AuthProvider>
+      </CartProvider>
     </ToastProvider>
   );
 }
