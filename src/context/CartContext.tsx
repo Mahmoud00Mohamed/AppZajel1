@@ -3,6 +3,7 @@ import {
   useContext,
   useState,
   useEffect,
+  useCallback,
   ReactNode,
 } from "react";
 import { useAuth } from "./AuthContext";
@@ -93,7 +94,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const loadCartFromServer = async () => {
+  const loadCartFromServer = useCallback(async () => {
     if (!isAuthenticated) return;
 
     setIsLoading(true);
@@ -126,7 +127,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isAuthenticated]);
 
   // Load cart from server when user is authenticated
   useEffect(() => {
@@ -159,7 +160,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
       if (response.ok) {
         const data: ServerCartResponse = await response.json();
-        const syncedCartItems = data.cart.items.map((item: any) => ({
+        const syncedCartItems = data.cart.items.map((item: ServerCartItem) => ({
           id: item.productId,
           nameEn: item.productData.nameEn,
           nameAr: item.productData.nameAr,
