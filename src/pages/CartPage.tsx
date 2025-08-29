@@ -16,7 +16,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../context/CartContext";
 import { ProductImage } from "../features/images";
 import { useAuth } from "../context/AuthContext";
-import { Link } from "react-router-dom";
 
 const CartPage: React.FC = () => {
   const { t, i18n } = useTranslation();
