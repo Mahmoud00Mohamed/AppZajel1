@@ -32,12 +32,24 @@ interface GiftAssistantForm {
 }
 
 const GiftAssistantPage: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const isRtl = i18n.language === "ar";
   const [currentStep, setCurrentStep] = useState(1);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [recommendations, setRecommendations] = useState<any[]>([]);
+  const [recommendations, setRecommendations] = useState<Array<{
+    id: number;
+    nameEn: string;
+    nameAr: string;
+    price: number;
+    imageUrl: string;
+    categoryId?: string;
+    occasionId?: string;
+    isBestSeller?: boolean;
+    isSpecialGift?: boolean;
+    descriptionEn?: string;
+    descriptionAr?: string;
+  }>>([]);
 
   const [form, setForm] = useState<GiftAssistantForm>({
     occasion: "",

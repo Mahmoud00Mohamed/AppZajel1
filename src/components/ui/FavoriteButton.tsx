@@ -5,7 +5,6 @@ import { useFavorites } from "../../context/FavoritesContext";
 import { useToast } from "../../context/ToastContext";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
-import { Link } from "react-router-dom";
 
 interface FavoriteButtonProps {
   product: {
@@ -31,7 +30,7 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   showLabel = false,
 }) => {
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
-  const { showSuccess, showInfo, showError } = useToast();
+  const { showError } = useToast();
   const { i18n } = useTranslation();
   const { isAuthenticated } = useAuth();
   const isRtl = i18n.language === "ar";
