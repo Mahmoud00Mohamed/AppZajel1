@@ -5,7 +5,6 @@ import { useCart } from "../../context/CartContext";
 import { useToast } from "../../context/ToastContext";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
-import { Link } from "react-router-dom";
 
 interface AddToCartButtonProps {
   product: {
@@ -14,6 +13,10 @@ interface AddToCartButtonProps {
     nameAr: string;
     price: number;
     imageUrl: string;
+    categoryId?: string;
+    occasionId?: string;
+    isBestSeller?: boolean;
+    isSpecialGift?: boolean;
   };
   className?: string;
   size?: "sm" | "md" | "lg";

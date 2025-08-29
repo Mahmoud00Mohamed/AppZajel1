@@ -8,6 +8,27 @@ import {
 import { useAuth } from "./AuthContext";
 import { useToast } from "./ToastContext";
 
+interface ServerCartItem {
+  productId: number;
+  productData: {
+    nameEn: string;
+    nameAr: string;
+    price: number;
+    imageUrl: string;
+    categoryId?: string;
+    occasionId?: string;
+    isBestSeller?: boolean;
+    isSpecialGift?: boolean;
+  };
+  quantity: number;
+}
+
+interface ServerCartResponse {
+  cart: {
+    items: ServerCartItem[];
+  };
+}
+
 interface CartItem {
   id: number;
   nameEn: string;
@@ -51,16 +72,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     };
   };
 
-  // Load cart from server when user is authenticated
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      loadCartFromServer();
-    } else {
-      // Load from localStorage for non-authenticated users
-      loadCartFromLocalStorage();
-    }
-  }, [isAuthenticated, user]);
-
   const loadCartFromLocalStorage = () => {
     try {
       const savedCart = localStorage.getItem("zajil-cart");
@@ -92,7 +103,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data: ServerCartResponse = await response.json();
         const serverCartItems = data.cart.items.map((item: any) => ({
           id: item.productId,
           nameEn: item.productData.nameEn,
@@ -116,6 +127,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Load cart from server when user is authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      loadCartFromServer();
+    } else {
+      // Load from localStorage for non-authenticated users
+      loadCartFromLocalStorage();
+    }
+  }, [isAuthenticated, user]);
+
   const syncCart = async () => {
     if (!isAuthenticated) return;
 
@@ -136,7 +157,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data: ServerCartResponse = await response.json();
         const syncedCartItems = data.cart.items.map((item: any) => ({
           id: item.productId,
           nameEn: item.productData.nameEn,
@@ -192,7 +213,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         }),
       });
 
-      const data = await response.json();
+      const data: ServerCartResponse = await response.json();
 
       if (response.ok) {
         const updatedCartItems = data.cart.items.map((item: any) => ({
@@ -237,7 +258,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         credentials: "include",
       });
 
-      const data = await response.json();
+      const data: ServerCartResponse = await response.json();
 
       if (response.ok) {
         const updatedCartItems = data.cart.items.map((item: any) => ({
@@ -288,7 +309,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         body: JSON.stringify({ quantity }),
       });
 
-      const data = await response.json();
+      const data: ServerCartResponse = await response.json();
 
       if (response.ok) {
         const updatedCartItems = data.cart.items.map((item: any) => ({
@@ -333,7 +354,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         credentials: "include",
       });
 
-      const data = await response.json();
+      const data: { message: string } = await response.json();
 
       if (response.ok) {
         setCart([]);
