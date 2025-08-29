@@ -151,7 +151,7 @@ const Header = () => {
               <span className="hidden lg:inline text-xs font-medium ml-1.5 rtl:mr-1.5 text-gray-700">
                 {t("bottomNav.favorites")}
               </span>
-              {favoritesCount > 0 && (
+              {isAuthenticated && favoritesCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold">
                   {favoritesCount > 99 ? "99+" : favoritesCount}
                 </span>
@@ -534,7 +534,7 @@ const Header = () => {
                 >
                   <Heart size={18} />
                   {t("bottomNav.favorites")}
-                  {favoritesCount > 0 && (
+                  {isAuthenticated && favoritesCount > 0 && (
                     <span className="absolute right-3 rtl:left-3 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                       {favoritesCount > 99 ? "99+" : favoritesCount}
                     </span>

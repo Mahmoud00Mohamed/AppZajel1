@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 import { useFavorites } from "../../context/FavoritesContext";
+import { useAuth } from "../../context/AuthContext";
 import { motion } from "framer-motion";
 
 // الخطوة 1: استيراد أيقونات Heroicons الحديثة والبسيطة
@@ -22,6 +23,7 @@ const BottomNavigation: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const { favoritesCount } = useFavorites();
+  const { isAuthenticated } = useAuth();
 
   // الخطوة 2: تحديث مصفوفة الأيقونات لاستخدام أيقونات Heroicons
   const navItems = React.useMemo(
@@ -104,6 +106,7 @@ const BottomNavigation: React.FC = () => {
                 )}
                 {item.id === "favorites" &&
                   typeof item.badge === "number" &&
+                  isAuthenticated &&
                   item.badge > 0 && (
                     <span className="absolute -top-1.5 -right-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white">
                       {item.badge > 9 ? "9+" : item.badge}

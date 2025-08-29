@@ -127,7 +127,14 @@ function App() {
                         path="/notifications"
                         element={<NotificationsPage />}
                       />
-                      <Route path="/favorites" element={<FavoritesPage />} />
+                      <Route 
+                        path="/favorites" 
+                        element={
+                          <ProtectedRoute requireAuthForFavorites={true}>
+                            <FavoritesPage />
+                          </ProtectedRoute>
+                        } 
+                      />
                       <Route path="/packages" element={<PackagesPage />} />
                       <Route
                         path="/gift-assistant"

@@ -4,6 +4,8 @@ import { Heart } from "lucide-react";
 import { useFavorites } from "../../context/FavoritesContext";
 import { useToast } from "../../context/ToastContext";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../context/AuthContext";
+import { Link } from "react-router-dom";
 
 interface FavoriteButtonProps {
   product: {
@@ -29,8 +31,9 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   showLabel = false,
 }) => {
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
-  const { showSuccess, showInfo } = useToast();
+  const { showSuccess, showInfo, showError } = useToast();
   const { i18n } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const isRtl = i18n.language === "ar";
 
   const isProductFavorite = isFavorite(product.id);
@@ -39,27 +42,21 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     e.preventDefault();
     e.stopPropagation();
 
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      showError(
+        isRtl ? "تسجيل الدخول مطلوب" : "Login Required",
+        isRtl
+          ? "يجب تسجيل الدخول لإضافة المنتجات إلى المفضلة"
+          : "Please login to add products to favorites"
+      );
+      return;
+    }
     try {
       if (isProductFavorite) {
         removeFromFavorites(product.id);
-        showInfo(
-          isRtl ? "تم الحذف من المفضلة" : "Removed from Favorites",
-          isRtl
-            ? `تم حذف ${product.nameAr} من المفضلة`
-            : `${product.nameEn} removed from favorites`
-        );
       } else {
         addToFavorites(product);
-
-        // تم حذف كائن الـ action من هنا
-        showSuccess(
-          isRtl ? "تم الإضافة للمفضلة" : "Added to Favorites",
-          isRtl
-            ? `تم إضافة ${product.nameAr} إلى المفضلة`
-            : `${product.nameEn} added to favorites`,
-          undefined, // <- تم حذف الزر
-          "favorite-success"
-        );
       }
     } catch (error) {
       console.error("خطأ في تبديل المفضلة:", error);

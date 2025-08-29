@@ -6,6 +6,7 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAuth?: boolean;
   requirePhoneVerification?: boolean;
+  requireAuthForFavorites?: boolean;
   redirectTo?: string;
 }
 
@@ -13,6 +14,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requireAuth = true,
   requirePhoneVerification = false,
+  requireAuthForFavorites = false,
   redirectTo = "/auth/login",
 }) => {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -33,6 +35,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
+  // Special case for favorites page - show login prompt instead of redirect
+  if (requireAuthForFavorites && !isAuthenticated) {
+    // Let the FavoritesPage component handle the login prompt
+    return <>{children}</>;
+  }
   if (!requireAuth && isAuthenticated) {
     // إذا كان المستخدم مسجل دخول ولكن لم يتحقق من الهاتف، وجهه لصفحة إعداد الهاتف
     if (
