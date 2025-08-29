@@ -27,6 +27,7 @@ interface ServerCartResponse {
   cart: {
     items: ServerCartItem[];
   };
+  message?: string;
 }
 
 interface CartItem {
@@ -104,7 +105,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
       if (response.ok) {
         const data: ServerCartResponse = await response.json();
-        const serverCartItems = data.cart.items.map((item: any) => ({
+        const serverCartItems = data.cart.items.map((item: ServerCartItem) => ({
           id: item.productId,
           nameEn: item.productData.nameEn,
           nameAr: item.productData.nameAr,
@@ -135,7 +136,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       // Load from localStorage for non-authenticated users
       loadCartFromLocalStorage();
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, loadCartFromServer]);
 
   const syncCart = async () => {
     if (!isAuthenticated) return;
@@ -216,7 +217,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       const data: ServerCartResponse = await response.json();
 
       if (response.ok) {
-        const updatedCartItems = data.cart.items.map((item: any) => ({
+        const updatedCartItems = data.cart.items.map((item: ServerCartItem) => ({
           id: item.productId,
           nameEn: item.productData.nameEn,
           nameAr: item.productData.nameAr,
@@ -261,7 +262,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       const data: ServerCartResponse = await response.json();
 
       if (response.ok) {
-        const updatedCartItems = data.cart.items.map((item: any) => ({
+        const updatedCartItems = data.cart.items.map((item: ServerCartItem) => ({
           id: item.productId,
           nameEn: item.productData.nameEn,
           nameAr: item.productData.nameAr,
@@ -312,7 +313,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       const data: ServerCartResponse = await response.json();
 
       if (response.ok) {
-        const updatedCartItems = data.cart.items.map((item: any) => ({
+        const updatedCartItems = data.cart.items.map((item: ServerCartItem) => ({
           id: item.productId,
           nameEn: item.productData.nameEn,
           nameAr: item.productData.nameAr,
