@@ -4,7 +4,6 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Phone, RefreshCw, CheckCircle } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { useCart } from "../../context/CartContext";
 
 const PhoneLoginVerificationForm: React.FC = () => {
   const { i18n } = useTranslation();
@@ -12,7 +11,6 @@ const PhoneLoginVerificationForm: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { verifyPhoneLogin, loginWithPhone } = useAuth();
-  const { syncCart } = useCart();
 
   const [verificationCode, setVerificationCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +40,6 @@ const PhoneLoginVerificationForm: React.FC = () => {
 
     try {
       await verifyPhoneLogin(phoneNumber, verificationCode);
-      await syncCart();
       navigate("/");
     } catch (error) {
       console.error("Phone login verification error:", error);

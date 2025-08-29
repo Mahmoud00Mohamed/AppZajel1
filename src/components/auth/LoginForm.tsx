@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useRecaptcha } from "../../hooks/useRecaptcha";
-import { useCart } from "../../context/CartContext";
 
 const API_BASE_URL = "https://localhost:3002/api/auth";
 
@@ -23,7 +22,6 @@ const LoginForm: React.FC = () => {
   const isRtl = i18n.language === "ar";
   const navigate = useNavigate();
   const { login, loginWithPhone } = useAuth();
-  const { syncCart } = useCart();
 
   const { executeRecaptcha } = useRecaptcha({
     siteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY,
@@ -51,7 +49,6 @@ const LoginForm: React.FC = () => {
 
       if (loginMethod === "email") {
         await login(formData.email, formData.password, captchaToken);
-        await syncCart();
         navigate("/");
       } else {
         await loginWithPhone(formData.phoneNumber);

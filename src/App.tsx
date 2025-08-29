@@ -1,11 +1,11 @@
 import { useEffect, Suspense, lazy } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { CartProvider } from "./context/CartContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
 import { ToastProvider } from "./context/ToastContext";
 import { AuthProvider } from "./context/AuthContext";
 import { UserProvider } from "./context/UserContext";
-import { CartProvider } from "./context/CartContext";
 import { imageCache } from "./features/images";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
@@ -82,8 +82,8 @@ function App() {
     <ToastProvider>
       <AuthProvider>
         <UserProvider>
-          <CartProvider>
-            <FavoritesProvider>
+          <FavoritesProvider>
+            <CartProvider>
               <div
                 className={`min-h-screen flex flex-col ${
                   i18n.language === "ar" ? "font-sans-ar" : "font-sans-en"
@@ -236,8 +236,8 @@ function App() {
                 <Footer />
                 <BottomNavigation />
               </div>
-            </FavoritesProvider>
-          </CartProvider>
+            </CartProvider>
+          </FavoritesProvider>
         </UserProvider>
       </AuthProvider>
     </ToastProvider>
