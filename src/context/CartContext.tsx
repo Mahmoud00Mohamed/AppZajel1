@@ -78,6 +78,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       // Clear cart when user logs out
       setCart([]);
     }
+  }
+  )
 
   const addToCart = (product: CartItem) => {
     if (!isAuthenticated) {
