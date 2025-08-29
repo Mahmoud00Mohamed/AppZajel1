@@ -4,7 +4,6 @@ import { ShoppingCart, Check } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useToast } from "../../context/ToastContext";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "../../context/AuthContext";
 
 interface AddToCartButtonProps {
   product: {
@@ -32,7 +31,6 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   const { addToCart } = useCart();
   const { showSuccess } = useToast();
   const { t, i18n } = useTranslation();
-  const { isAuthenticated } = useAuth();
   const isRtl = i18n.language === "ar";
   const [isAdding, setIsAdding] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
@@ -53,14 +51,6 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     e.preventDefault();
     e.stopPropagation();
 
-    if (!isAuthenticated) {
-      showSuccess(
-        "تسجيل الدخول مطلوب",
-        "يجب تسجيل الدخول لإضافة المنتجات إلى السلة"
-      );
-      return;
-    }
-
     if (isAdding || justAdded) return;
 
     setIsAdding(true);
@@ -77,6 +67,16 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 
       setJustAdded(true);
 
+      // تم حذف كائن الـ action من هنا
+      showSuccess(
+        isRtl ? "تم الإضافة للسلة" : "Added to Cart",
+        isRtl
+          ? `تم إضافة ${product.nameAr} إلى عربة التسوق`
+          : `${product.nameEn} added to cart`,
+        undefined, // <- تم حذف الزر
+        "cart-success"
+      );
+
       setTimeout(() => {
         setJustAdded(false);
         setIsAdding(false);
@@ -85,6 +85,12 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
       console.error("خطأ في إضافة المنتج إلى عربة التسوق:", error);
       setIsAdding(false);
 
+      if (showSuccess) {
+        showSuccess(
+          isRtl ? "خطأ" : "Error",
+          isRtl ? "حدث خطأ أثناء إضافة المنتج" : "Error adding product to cart"
+        );
+      }
     }
   };
 
