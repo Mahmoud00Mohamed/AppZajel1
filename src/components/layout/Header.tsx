@@ -272,14 +272,29 @@ const Header = () => {
             {/* Cart */}
             <Link
               to="/cart"
-              className="relative flex items-center text-gray-600 hover:text-purple-600 transition-all group"
+              className={`relative flex items-center transition-all group ${
+                isAuthenticated 
+                  ? "text-gray-600 hover:text-purple-600" 
+                  : "text-gray-400 cursor-not-allowed"
+              }`}
+              onClick={(e) => {
+                if (!isAuthenticated) {
+                  e.preventDefault();
+                  alert(isRtl ? "يجب تسجيل الدخول لعرض السلة" : "Please login to view cart");
+                }
+              }}
             >
               <div className="p-2 bg-gray-100 hover:bg-purple-100 rounded-full transition-colors">
                 <ShoppingBasket size={20} />
               </div>
-              {cartCount > 0 && (
+              {isAuthenticated && cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 rtl:-left-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold animate-bounce">
                   {cartCount > 99 ? "99+" : cartCount}
+                </span>
+              )}
+              {!isAuthenticated && (
+                <span className="absolute -top-1 -right-1 rtl:-left-1 bg-gray-400 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold">
+                  0
                 </span>
               )}
             </Link>

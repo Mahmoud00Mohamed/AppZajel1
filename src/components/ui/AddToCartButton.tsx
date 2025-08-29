@@ -4,6 +4,8 @@ import { ShoppingCart, Check } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useToast } from "../../context/ToastContext";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../context/AuthContext";
+import { Link } from "react-router-dom";
 
 interface AddToCartButtonProps {
   product: {
@@ -31,6 +33,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   const { addToCart } = useCart();
   const { showSuccess } = useToast();
   const { t, i18n } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const isRtl = i18n.language === "ar";
   const [isAdding, setIsAdding] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
@@ -51,17 +54,38 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     e.preventDefault();
     e.stopPropagation();
 
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      showSuccess(
+        isRtl ? "تسجيل الدخول مطلوب" : "Login Required",
+        isRtl
+          ? "يجب تسجيل الدخول لإضافة المنتجات إلى السلة"
+          : "Please login to add products to cart",
+        {
+          label: isRtl ? "تسجيل الدخول" : "Login",
+          onClick: () => {
+            window.location.href = "/auth/login";
+          },
+        },
+        "cart-success"
+      );
+      return;
+    }
     if (isAdding || justAdded) return;
 
     setIsAdding(true);
 
     try {
-      addToCart({
+      await addToCart({
         id: product.id,
         nameEn: product.nameEn,
         nameAr: product.nameAr,
         price: product.price,
         imageUrl: product.imageUrl,
+        categoryId: product.categoryId,
+        occasionId: product.occasionId,
+        isBestSeller: product.isBestSeller,
+        isSpecialGift: product.isSpecialGift,
         quantity: quantity,
       });
 
